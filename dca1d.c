@@ -4,14 +4,16 @@
 #include "dca1d.h"
 
 int main(void) {
-    int lengthOfAuto = 32;
+    int lengthOfAuto = 25;
     unsigned char dca1d[lengthOfAuto];
     init1DCA(lengthOfAuto, dca1d);
-    set1DCACell(dca1d, 0, '1');
-    set1DCACell(dca1d, 2, '1');
-    set1DCACell(dca1d, 4, '1');
-    set1DCACell(dca1d, 29, '1');
-    set1DCACell(dca1d, 31, '1');
+    for(int i = 0; i < lengthOfAuto; i++) {
+        if(i % 2 != 0) {
+            set1DCACell(dca1d, i, '1'); //set odd to 1
+        } else {
+            set1DCACell(dca1d, i, '2'); //set even to 2
+        }
+    }
     display1DCA(dca1d, lengthOfAuto);
     return 0;
 }
