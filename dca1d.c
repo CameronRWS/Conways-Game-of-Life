@@ -3,7 +3,7 @@
 #include <string.h>
 
 
-void init1DCA(int numCellsToCreate, char *startOfString) {
+void init1DCA(int numCellsToCreate, unsigned char *startOfString) {
     for(int i = 0; i < numCellsToCreate - 1; i++) {
         startOfString[i] = '0';
     }
@@ -12,7 +12,7 @@ void init1DCA(int numCellsToCreate, char *startOfString) {
 
 int main(void) {
     int lengthOfAuto = 32;
-    char dca1d[lengthOfAuto];
+    unsigned char dca1d[lengthOfAuto];
     init1DCA(lengthOfAuto, dca1d);
     printf("%s\n", dca1d);
     return 0;
