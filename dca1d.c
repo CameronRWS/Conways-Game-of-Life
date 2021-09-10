@@ -1,7 +1,20 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "dca1d.h"
 
+int main(void) {
+    int lengthOfAuto = 32;
+    unsigned char dca1d[lengthOfAuto];
+    init1DCA(lengthOfAuto, dca1d);
+    set1DCACell(dca1d, 0, '1');
+    set1DCACell(dca1d, 2, '1');
+    set1DCACell(dca1d, 4, '1');
+    set1DCACell(dca1d, 29, '1');
+    set1DCACell(dca1d, 31, '1');
+    display1DCA(dca1d, lengthOfAuto);
+    return 0;
+}
 
 void init1DCA(int numCellsToCreate, unsigned char *theDCA1D) {
     for(int i = 0; i < numCellsToCreate - 1; i++) {
@@ -22,17 +35,4 @@ void display1DCA(unsigned char *theDCA1D, int numCells) {
         printf("%c ", theDCA1D[i]);
     }
     printf("%c\n", theDCA1D[numCells - 1]); //the last one without a space at the end.
-}
-
-int main(void) {
-    int lengthOfAuto = 32;
-    unsigned char dca1d[lengthOfAuto];
-    init1DCA(lengthOfAuto, dca1d);
-    set1DCACell(dca1d, 0, '1');
-    set1DCACell(dca1d, 2, '1');
-    set1DCACell(dca1d, 4, '1');
-    set1DCACell(dca1d, 29, '1');
-    set1DCACell(dca1d, 31, '1');
-    display1DCA(dca1d, lengthOfAuto);
-    return 0;
 }
