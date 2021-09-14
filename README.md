@@ -1,2 +1,5 @@
-# This is the project for COMS 327 Part 1
+# COMS 327 - Project 1 Part A
+'make clean' to remove all files ending with '.o' or '.out'
+'make' to build the project
+'./odca.out' to run the project 
 
