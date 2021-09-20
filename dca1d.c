@@ -28,9 +28,10 @@ void init1DCA(int numCellsToCreate, unsigned char *theDCA1D) {
 //Sets the value of a 1DCA's cell given a pointer to the 1DCA, the index you want to set, and the char to set the cell to.
 void set1DCACell(unsigned char *theDCA1D, int index, unsigned char charToSet) {
     if(index < 0) {
-        printf("Error with set1DCACell - index is negative.");
+        printf("Error with set1DCACell usage - index is negative. The 1DCA was not modified.\n");
+    } else {
+        theDCA1D[index] = charToSet;
     }
-    theDCA1D[index] = charToSet;
 }
 
 //Displays a 1DCA given a pointer to where the 1DCA is stored, and the length of the 1DCA.
