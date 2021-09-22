@@ -10,7 +10,7 @@ This part of the project is the infrastructure for the sand painting project.
 
 ## Known Errors and Issues
 
-N/A
+The input validation for set1DCACell only checks for negative values of the passed in index. Future parts of this project will allow for much better input validation.
 
 ## Usage (How to Execute)
 
