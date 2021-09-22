@@ -1,6 +1,6 @@
 /**
  * Author: Cameron Smith
- * Description: Store the signatures for 3 functions for initializing, setting values of, 
+ * Description: Stores the signatures for 3 functions for initializing, setting values of, 
  *      and displaying a 1DCA.
  */
 

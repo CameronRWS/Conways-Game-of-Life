@@ -1,6 +1,6 @@
 /**
  * Author: Cameron Smith
- * Description: Store 3 functions for initializing, setting values of, and displaying a 1DCA. Also
+ * Description: Stores 3 functions for initializing, setting values of, and displaying a 1DCA. Also
  *      (for now) another purpose is to demo the 3 functions in the main method. See documentation
  *      for each function for more information.
  */
