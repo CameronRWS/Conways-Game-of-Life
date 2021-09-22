@@ -6,6 +6,7 @@ This part of the project is the infrastructure for the sand painting project.
 1. Initialize a 1D Cellular Automata (1DCA)
 2. Set the value of a specific cell in the 1DCA
 3. Print a 1DCA
+4. Demos all 3 previously mentioned features per the assignment requirements.
 
 ## Known Errors and Issues
 
