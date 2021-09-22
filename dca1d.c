@@ -16,7 +16,7 @@
  */ 
 int main(void) {
     int lengthOfAuto = 25; //We want 25 cells in our 1DCA per assignment instructions
-    unsigned char dca1d[lengthOfAuto+1]; //Create the char array of length 25 + 1 (for \0)
+    unsigned char dca1d[lengthOfAuto]; //Create the char array of length 25 to store our 1DCA.
     init1DCA(lengthOfAuto, dca1d); //Set all values in the 1DCA to 0 and add \0 to the end.
     for(int i = 0; i < lengthOfAuto; i++) { //For every index in the 1DCA
         if(i % 2 != 0) {                //If the index is odd
@@ -40,7 +40,6 @@ void init1DCA(int numCellsToCreate, unsigned char *theDCA1D) {
     for(int i = 0; i < numCellsToCreate; i++) { //Go through each index and set the value to 0.
         theDCA1D[i] = '0'; //0 is the value of the quiescent state.
     }
-    theDCA1D[numCellsToCreate] = '\0'; //Adds the string termination char to the end of our 1DCA.
 }
 
 /** 
