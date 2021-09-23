@@ -10,7 +10,7 @@ This part of the project is the infrastructure for the sand painting project.
 - void set1DCACell(unsigned char *theDCA1D, int index, unsigned char charToSet) - Sets the value of a 1DCA's cell given a pointer to the 1DCA, the index you want to set, and the char to set the cell to. Checks for a non-negative integer before setting the value.
 - void display1DCA(unsigned char *theDCA1D, int numCells) - Displays a 1DCA given a pointer to where the 1DCA is stored, and the length of the 1DCA. It does so by iterating through each char of the 1DCA and printing each one individually with a space in between.
 
-##### dca1d.h - Contains function signatures for dca1d.c. See dca1d.c for more a description on each function.
+##### dca1d.h - Contains function signatures for dca1d.c. See dca1d.c for a description of each function.
 
 - void init1DCA(int numCellsToCreate, unsigned char *theDCA1D)
 - void set1DCACell(unsigned char *theDCA1D, int index, unsigned char charToSet) 
