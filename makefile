@@ -1,9 +1,12 @@
-odca: dca1d.o
-	gcc dca1d.o
+main: main.o
+	gcc main.o
 	mv a.out odca.out 
 
-dca1d.o: dca1d.c dca1d.h
-	gcc -c dca1d.c
+main.o: main.c ca.o ca.h
+	gcc -c main.c
+
+ca.o: ca.c ca.h
+	gcc -c ca.c
 
 clean: 
 	rm *.o
