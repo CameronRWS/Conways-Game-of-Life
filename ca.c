@@ -16,8 +16,8 @@ void display1DCA(struct ca_data *theDCA1D) {
 }
 
 int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char charToSet) {
-    if(index < 0) { //If the passed in index is negative, then the index would be out of bounds.
-        printf("Error with set1DCACell usage - index is negative. The 1DCA was not modified.\n");
+    if(!(0 <= index && index <= theDCA1D->numCells-1)) {
+        printf("Error with set1DCACell usage - index out of bounds. The 1DCA was not modified.\n");
         return 0; //Return 0 because of error.
     } else {        //If the index isn't negative then we can set the value.
         theDCA1D->cells[index] = charToSet; //Set the value at the index to the char passed in.

@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
     int numSteps = atoi(argv[5]); //Number of steps to simulate.
     //printf("Input: %d %d %d %d %d\n", numCells, numStates, shouldWrapFlag, quiescentState, numSteps);
     //make sure input is all ints
-    
+
     if(!(10 <= numCells && numCells <= 100)) {
         printf("Error with 1st argument: Your 1DCA has to have a cell count between 10 and 100 (inclusive). You entered %d.\n", numCells);
         return 0;
@@ -54,4 +54,5 @@ int main(int argc, char **argv) {
         stepCA(ca, &rule110, shouldWrapFlag);
         display1DCA(ca);
     }
+
 }
