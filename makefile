@@ -11,10 +11,3 @@ ca.o: ca.c ca.h
 clean: 
 	rm *.o
 	rm *.out
-
-run:
-	./odca.out
-
-mrun:
-	make
-	make run

@@ -10,12 +10,9 @@ void init1DCA(struct ca_data *theDCA1D, int quiescentState) {
 
 void display1DCA(struct ca_data *theDCA1D) {
     for(int i = 0; i < theDCA1D->numCells - 1; i++) { //For all cells within the 1DCA except the last one.
-        //printf("%d", theDCA1D->cells[i]); //Print the char at each index with a space after it.
-        printf("(%d: %u) - ", i, theDCA1D->cells[i]); //DEBUG CODE
-
+        printf("%d ", theDCA1D->cells[i]); //Print the char at each index with a space after it.
     }
-    //printf("%d\n", theDCA1D->cells[theDCA1D->numCells - 1]); //Print last one without a space and add a new line.
-    printf("(%d: %u)\n", theDCA1D->numCells - 1, theDCA1D->cells[theDCA1D->numCells - 1]); //DEBUG CODE
+    printf("%d\n", theDCA1D->cells[theDCA1D->numCells - 1]); //Print last one without a space and add a new line.
 }
 
 int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char charToSet) {
@@ -37,50 +34,46 @@ struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState) 
     return ca;
 }
 
-void stepCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *theDCA1D, int index, int flag), int flag) {
-    unsigned char arrTemp[theDCA1D->numCells];
-    for(int i = 0; i < theDCA1D->numCells; i++) {
-        arrTemp[i] = theDCA1D->cells[i];
+void stepCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *theDCA1D, int index), int flag) {
+    int numCells = theDCA1D->numCells;
+    struct ca_data *tempDCA1D = create1DCA(numCells+2, theDCA1D->quiescentState);
+    for(int i = 1; i < theDCA1D->numCells + 1; i++) {
+        tempDCA1D->cells[i] = theDCA1D->cells[i-1];
     }
-    for(int i = 0; i < theDCA1D->numCells - 1; i++) {
-        //printf("value of i in stepCA: %d\n", i);
-        arrTemp[i] = ruleFunc(theDCA1D, i, flag);
+    if(flag) { 
+        tempDCA1D->cells[0] = tempDCA1D->cells[numCells-1];
+        tempDCA1D->cells[numCells+1] = tempDCA1D->cells[1];
     }
-    theDCA1D->cells = arrTemp;
+    for(int i = 1; i < theDCA1D->numCells + 1; i++) {
+        theDCA1D->cells[i-1] = ruleFunc(tempDCA1D, i);
+    }
 }
 
-unsigned char rule110(struct ca_data *theDCA1D, int index, int flag) {
-    unsigned char n1, n2, n3;
+unsigned char rule110(struct ca_data *theDCA1D, int index) {
+    unsigned char n1, n2, n3, r; //neighbors and result
+    n1 = theDCA1D->cells[index-1];
     n2 = theDCA1D->cells[index];
-    //printf("value of n2: %u\n", n2);
-    int maxIndex = theDCA1D->numCells;
-    if(flag) { //if should wrap
-        if(index == 0) {
-            n1 = theDCA1D->cells[maxIndex];
-            n3 = theDCA1D->cells[index+1];
-        } else if(index == maxIndex) {
-            n1 = theDCA1D->cells[index-1];
-            n3 = theDCA1D->cells[0];
-        } else {
-            n1 = theDCA1D->cells[index-1];
-            n3 = theDCA1D->cells[index+1];
-        }
-    } else { //if shouldn't wrap
-        if(index == 0) {
-            n1 = theDCA1D->quiescentState;
-            n3 = theDCA1D->cells[index+1];
-        } else if(index == maxIndex) {
-            n1 = theDCA1D->cells[index-1];
-            n3 = theDCA1D->quiescentState;
-        } else {
-            n1 = theDCA1D->cells[index-1];
-            n3 = theDCA1D->cells[index+1];
-        }
-    }
-    if(n1 == 1 && n2 == 1 && n3 == 1) {
-        return 0;
+    n3 = theDCA1D->cells[index+1];
+    if       (n1 == 1 && n2 == 1 && n3 == 1) {
+        r = 0;
+    } else if(n1 == 1 && n2 == 1 && n3 == 0) {
+        r = 1;
+    } else if(n1 == 1 && n2 == 0 && n3 == 1) {
+        r = 1;
+    } else if(n1 == 1 && n2 == 0 && n3 == 0) {
+        r = 0;
+    } else if(n1 == 0 && n2 == 1 && n3 == 1) {
+        r = 1;
+    } else if(n1 == 0 && n2 == 1 && n3 == 0) {
+        r = 1;
+    } else if(n1 == 0 && n2 == 0 && n3 == 1) {
+        r = 1;
+    } else if(n1 == 0 && n2 == 0 && n3 == 0) {
+        r = 0;
     } else {
-        return 1;
+        r = theDCA1D->quiescentState;
     }
+    //printf("%d|%d|%d => r: %d\n", n1, n2, n3, r);
+    return r;
 }
 
