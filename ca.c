@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "ca.h"
 
 void init1DCA(struct ca_data *theDCA1D, int quiescentState) {
@@ -18,10 +19,10 @@ void display1DCA(struct ca_data *theDCA1D) {
 int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char charToSet) {
     if(!(0 <= index && index <= theDCA1D->numCells-1)) {
         printf("Error with set1DCACell usage - index out of bounds. The 1DCA was not modified.\n");
-        return 0; //Return 0 because of error.
-    } else {        //If the index isn't negative then we can set the value.
+        return 1; //Return 1 because of error.
+    } else {      //If the index is within the bounds of the 1DCA, we can set it.
         theDCA1D->cells[index] = charToSet; //Set the value at the index to the char passed in.
-        return 1; //Return 1 because no error.
+        return 0; //Return 0 because no error.
     }
 }
 
@@ -54,26 +55,26 @@ unsigned char rule110(struct ca_data *theDCA1D, int index) {
     n1 = theDCA1D->cells[index-1];
     n2 = theDCA1D->cells[index];
     n3 = theDCA1D->cells[index+1];
+    int rule[] = {0,1,1,0,1,1,1,0}; //rule110 encoded
     if       (n1 == 1 && n2 == 1 && n3 == 1) {
-        r = 0;
+        r = rule[0];
     } else if(n1 == 1 && n2 == 1 && n3 == 0) {
-        r = 1;
+        r = rule[1];
     } else if(n1 == 1 && n2 == 0 && n3 == 1) {
-        r = 1;
+        r = rule[2];
     } else if(n1 == 1 && n2 == 0 && n3 == 0) {
-        r = 0;
+        r = rule[3];
     } else if(n1 == 0 && n2 == 1 && n3 == 1) {
-        r = 1;
+        r = rule[4];
     } else if(n1 == 0 && n2 == 1 && n3 == 0) {
-        r = 1;
+        r = rule[5];
     } else if(n1 == 0 && n2 == 0 && n3 == 1) {
-        r = 1;
+        r = rule[6];
     } else if(n1 == 0 && n2 == 0 && n3 == 0) {
-        r = 0;
-    } else {
+        r = rule[7];
+    } else { //this case shouldn't occur but I wanted to put something here just in case.
         r = theDCA1D->quiescentState;
     }
-    //printf("%d|%d|%d => r: %d\n", n1, n2, n3, r);
     return r;
 }
 
