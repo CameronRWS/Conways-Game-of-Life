@@ -3,12 +3,24 @@
 #include <string.h>
 #include "ca.h"
 
+/** 
+ * Description: Initializes a 1DCA given a pointer to where the 1DCA is stored (struct ca_data).
+ *      This function will set all values in the 1DCA to it's passed in quiescent state.
+ * Parameter: struct ca_data *theDCA1D - A pointer to the 1DCA struct that will be initiated.
+ * Parameter: int quiescentState - The quiescent state to set the cells in the 1DCA to.
+ */
 void init1DCA(struct ca_data *theDCA1D, int quiescentState) {
-    for(int i = 0; i < theDCA1D->numCells; i++) { //Go through each index.
-        theDCA1D->cells[i] = quiescentState; //Set each cell to the quiescent state.
+    for(int i = 0; i < theDCA1D->numCells; i++) { //Go through each index of the cells.
+        theDCA1D->cells[i] = quiescentState; //Set each cell to the quiescent state passed in.
     }
 }
 
+/* 
+ * Description: Displays a 1DCA given a pointer to where the 1DCA is stored (struct ca_data).
+ *      It does so by iterating through each char of the 1DCA and printing each one
+ *      individually with a space in between.
+ * Parameter: struct ca_data *theDCA1D - A pointer to the 1DCA struct that will be displayed.
+ */
 void display1DCA(struct ca_data *theDCA1D) {
     for(int i = 0; i < theDCA1D->numCells - 1; i++) { //For all cells within the 1DCA except the last one.
         printf("%d ", theDCA1D->cells[i]); //Print the char at each index with a space after it.
@@ -16,8 +28,16 @@ void display1DCA(struct ca_data *theDCA1D) {
     printf("%d\n", theDCA1D->cells[theDCA1D->numCells - 1]); //Print last one without a space and add a new line.
 }
 
+/** 
+ * Description: Sets the value of a 1DCA's cell given a pointer to the 1DCA (struct ca_data), 
+ *      the index you want to set, and the char to set the cell to. 
+ *      Checks that the passed in index is within bounds of the 1DCA.
+ * Parameter: struct ca_data *theDCA1D - A pointer to the 1DCA struct whose cell will be set.
+ * Parameter: int index - The index of the cell in the 1DCA you want to set the value of.
+ * Parameter: unsigned char charToSet - The char to set the cell to.
+ */
 int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char charToSet) {
-    if(!(0 <= index && index <= theDCA1D->numCells-1)) {
+    if(!(0 <= index && index <= theDCA1D->numCells-1)) { //If the index is not within the bounds of the cells.
         printf("Error with set1DCACell usage - index out of bounds. The 1DCA was not modified.\n");
         return 1; //Return 1 because of error.
     } else {      //If the index is within the bounds of the 1DCA, we can set it.
@@ -27,35 +47,43 @@ int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char char
 }
 
 struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState) {
-    struct ca_data *ca = malloc(sizeof(struct ca_data));
-    ca->quiescentState = quiescentState;
-    ca->numCells = numCells;
-    ca->cells = malloc(sizeof(unsigned char) * numCells);
-    init1DCA(ca, quiescentState);
-    return ca;
+    struct ca_data *ca = malloc(sizeof(struct ca_data)); //Allocate memory on the heap for the ca struct.
+    ca->quiescentState = quiescentState; //Set ca's quiescent state to the passed in quiescent state.
+    ca->numCells = numCells; //Set ca's number of cells to the passed in number of cells.
+    ca->cells = malloc(sizeof(unsigned char) * numCells); //Allocate memory on the heap for the cells array.
+    init1DCA(ca, quiescentState); //Set all the values of the 1DCA to the quiescentState.
+    return ca; //Return the pointer to the 1DCA that was created.
 }
 
 void stepCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *theDCA1D, int index), int flag) {
-    int numCells = theDCA1D->numCells;
+    int numCells = theDCA1D->numCells; //Store number of cells in the 1DCA for easy access (more readable code).
+    //The following code creates a temporary 1DCA with 2 extra cells to better handle edge cases.
     struct ca_data *tempDCA1D = create1DCA(numCells+2, theDCA1D->quiescentState);
-    for(int i = 1; i < theDCA1D->numCells + 1; i++) {
-        tempDCA1D->cells[i] = theDCA1D->cells[i-1];
+    //The following for loop copies the actual 1DCA's cells into the temporary 1DCA's inner cells (leaving the 1 cell on each end to be the quiescent state).
+    for(int i = 0; i < numCells; i++) { //For every cell in the actual 1DCA.
+        tempDCA1D->cells[i+1] = theDCA1D->cells[i]; //Copy the value into the temp 1DCA skipping the 1st cell.
     }
-    if(flag) { 
-        tempDCA1D->cells[0] = tempDCA1D->cells[numCells-1];
-        tempDCA1D->cells[numCells+1] = tempDCA1D->cells[1];
+    //The following code ensures the edge cells (leading and ending) are properly set.
+    //  Because the edge cells are by default set to the quiescent state, we don't need to do anything if the user specifies not to wrap.
+    if(flag) { //If flag (should wrap) is true, set the edge cells to the wrapped values on the other side of the actual 1DCA.
+        tempDCA1D->cells[0] = tempDCA1D->cells[numCells-1]; //Set leading cell to last cell in actual 1DCA.
+        tempDCA1D->cells[numCells+1] = tempDCA1D->cells[1]; //Set ending cell to first cell in actual 1DCA.
     }
-    for(int i = 1; i < theDCA1D->numCells + 1; i++) {
-        theDCA1D->cells[i-1] = ruleFunc(tempDCA1D, i);
+    //The following code goes through each cell of the actual 1DCA and calculates it's new value 
+    //  based off of the rule function passed in and the index of the temp 1DCA offset by 1.
+    for(int i = 0; i < numCells; i++) { //For each cell of the actual 1DCA.
+        theDCA1D->cells[i] = ruleFunc(tempDCA1D, i+1); //Set the new value using result of ruleFunc given the padded 1DCA and an index offset of 1.
     }
 }
 
-unsigned char rule110(struct ca_data *theDCA1D, int index) {
-    unsigned char n1, n2, n3, r; //neighbors and result
-    n1 = theDCA1D->cells[index-1];
-    n2 = theDCA1D->cells[index];
-    n3 = theDCA1D->cells[index+1];
-    int rule[] = {0,1,1,0,1,1,1,0}; //rule110 encoded
+unsigned char rule110(struct ca_data *tempDCA1D, int index) {
+    unsigned char n1, n2, n3, r; //Stores the 3 neighbors of the neighborhood as well as the result.
+    n1 = tempDCA1D->cells[index-1]; //Gets the left neighbor.
+    n2 = tempDCA1D->cells[index]; //Gets the current state of the cell we need to calculate the new cell from.
+    n3 = tempDCA1D->cells[index+1]; //Gets the right neighbor.
+    int rule[] = {0,1,1,0,1,1,1,0}; //Rule 110 encoded in the order of the possible permutations.
+    //The following code goes through each permutation of the neighbors and sets the result
+    //  based on the permutation. The rule array stores the results in order with the permutations.
     if       (n1 == 1 && n2 == 1 && n3 == 1) {
         r = rule[0];
     } else if(n1 == 1 && n2 == 1 && n3 == 0) {
@@ -73,7 +101,7 @@ unsigned char rule110(struct ca_data *theDCA1D, int index) {
     } else if(n1 == 0 && n2 == 0 && n3 == 0) {
         r = rule[7];
     } else { //this case shouldn't occur but I wanted to put something here just in case.
-        r = theDCA1D->quiescentState;
+        r = tempDCA1D->quiescentState;
     }
     return r;
 }
