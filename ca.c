@@ -35,6 +35,7 @@ void display1DCA(struct ca_data *theDCA1D) {
  * Parameter: struct ca_data *theDCA1D - A pointer to the 1DCA struct whose cell will be set.
  * Parameter: int index - The index of the cell in the 1DCA you want to set the value of.
  * Parameter: unsigned char charToSet - The char to set the cell to.
+ * Returns: Integer - returns 1 if no errors occured, 0 if an error occured.
  */
 int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char charToSet) {
     if(!(0 <= index && index <= theDCA1D->numCells-1)) { //If the index is not within the bounds of the cells.
@@ -46,6 +47,14 @@ int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char char
     }
 }
 
+/** 
+ * Description: Creates a 1DCA on the heap with the necessary memory space for the number of cells
+ *      requested and also sets the value of each cell to the quiescent state. The number of cells
+ *      and quiescent state is also stored in the created 1DCA for convenience.
+ * Parameter: unsigned int numCells - The number of cells the 1DCA created should have.
+ * Parameter: unsigned char quiescentState - The quiescent (default) state of the 1DCA.
+ * Returns: struct ca_data* - The pointer to the new 1DCA. Also returns NULL if memory couldn't be allocated.
+ */
 struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState) {
     struct ca_data *ca = malloc(sizeof(struct ca_data)); //Allocate memory on the heap for the ca struct.
     if(ca == NULL) return NULL; //Check to make sure the memory was allocated on the heap.
@@ -57,7 +66,21 @@ struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState) 
     return ca; //Return the pointer to the 1DCA that was created.
 }
 
-void stepCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *theDCA1D, int index), int flag) {
+/** 
+ * Description: Simulates one step of the 1DCA. It does this by creating a temporary 1DCA that
+ *      has an additional 2 cells (one on each end of the original 1DCA) and copying the values
+ *      from the original 1DCA into the temporary 1DCA (starting at index 1) and then depending on
+ *      the value of flag it sets the starting and ending cell. After creating this temporary 1DCA
+ *      (for the purpose of being able to calculate the neighborhood of the original 1DCA nicely),
+ *      the function goes through each index of the temporary 1DCA (starting at index 1 and ending
+ *      1 cell before the end) and using the passed in rule function calculates the next state of
+ *      index. It then frees the temporary 1DCA's memory as it's no longer needed.
+ * Parameter: struct ca_data *theDCA1D - A pointer to the 1DCA struct who needs simulated once.
+ * Parameter: unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index) - A pointer to a 
+ *      function that will calculate the next state of each index.
+ * Parameter: int flag - A variable for handling the edge cases of the 1DCA, 1 if 1DCA should wrap, 0 if not.
+ */
+void stepCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index), int flag) {
     int numCells = theDCA1D->numCells; //Store number of cells in the 1DCA for easy access (more readable code).
     //The following code creates a temporary 1DCA with 2 extra cells to better handle edge cases.
     struct ca_data *tempDCA1D = create1DCA(numCells+2, theDCA1D->quiescentState);
@@ -84,6 +107,14 @@ void stepCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *
     free(tempDCA1D); //Free the temporary 1DCA.
 }
 
+/** 
+ * Description: Calculates the next state of the indexed cell given the current state of the indexed cell
+ *      and it's surrounding 2 cells (it's neighborhood). At this point the edge cases are already
+ *      taken care of, and the client only asks for indices that have neighbors.
+ * Parameter: struct ca_data *tempDCA1D - A pointer to the temporary 1DCA struct that holds the 
+ *      original 1DCA along with the 2 extra cells (1 on each end) for edge cases.
+ * Parameter: int index - The index of the cell that needs it's next state calculated.
+ */
 unsigned char rule110(struct ca_data *tempDCA1D, int index) {
     unsigned char n1, n2, n3, r; //Stores the 3 neighbors of the neighborhood as well as the result.
     n1 = tempDCA1D->cells[index-1]; //Gets the left neighbor.
