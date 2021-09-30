@@ -61,6 +61,10 @@ void stepCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *
     int numCells = theDCA1D->numCells; //Store number of cells in the 1DCA for easy access (more readable code).
     //The following code creates a temporary 1DCA with 2 extra cells to better handle edge cases.
     struct ca_data *tempDCA1D = create1DCA(numCells+2, theDCA1D->quiescentState);
+    if(tempDCA1D == NULL) { //Check to make sure the 1DCA was created.
+        printf("Error with create1DCA: Unable to allocate required memory for the temp 1DCA.\n");
+        return;
+    }
     //The following for loop copies the actual 1DCA's cells into the temporary 1DCA's inner cells (leaving the 1 cell on each end to be the quiescent state).
     for(int i = 0; i < numCells; i++) { //For every cell in the actual 1DCA.
         tempDCA1D->cells[i+1] = theDCA1D->cells[i]; //Copy the value into the temp 1DCA skipping the 1st cell.
