@@ -69,12 +69,13 @@ struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState) 
 /** 
  * Description: Simulates one step of the 1DCA. It does this by creating a temporary 1DCA that
  *      has an additional 2 cells (one on each end of the original 1DCA) and copying the values
- *      from the original 1DCA into the temporary 1DCA (starting at index 1) and then depending on
- *      the value of flag it sets the starting and ending cell. After creating this temporary 1DCA
- *      (for the purpose of being able to calculate the neighborhood of the original 1DCA nicely),
- *      the function goes through each index of the temporary 1DCA (starting at index 1 and ending
- *      1 cell before the end) and using the passed in rule function calculates the next state of
- *      index. It then frees the temporary 1DCA's memory as it's no longer needed.
+ *      from the original 1DCA into the temporary 1DCA (starting at index 1 and ending 1 cell before
+ *      the end) and then depending on the value of flag it sets the starting and ending cell. 
+ *      After creating this temporary 1DCA (for the purpose of being able to calculate the 
+ *      neighborhood of the original 1DCA nicely), the function goes through each index of the 
+ *      temporary 1DCA (starting at index 1 and ending 1 cell before the end) and using the 
+ *      passed in rule function calculates the next state of indexed cell. It then frees the 
+ *      temporary 1DCA's memory as it's no longer needed.
  * Parameter: struct ca_data *theDCA1D - A pointer to the 1DCA struct who needs simulated once.
  * Parameter: unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index) - A pointer to a 
  *      function that will calculate the next state of each index.
