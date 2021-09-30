@@ -1,7 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ca.h"
+#include <stdio.h> //Allows for use of printf.
+#include <stdlib.h> //Allows for use of free and malloc.
+#include "ca.h" //Allows for 1DCA usage.
 
 /** 
  * Description: Initializes a 1DCA given a pointer to where the 1DCA is stored (struct ca_data).
