@@ -39,18 +39,20 @@ void display1DCA(struct ca_data *theDCA1D) {
 int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char charToSet) {
     if(!(0 <= index && index <= theDCA1D->numCells-1)) { //If the index is not within the bounds of the cells.
         printf("Error with set1DCACell usage - index out of bounds. The 1DCA was not modified.\n");
-        return 1; //Return 1 because of error.
+        return 0; //Return 0 because of error.
     } else {      //If the index is within the bounds of the 1DCA, we can set it.
         theDCA1D->cells[index] = charToSet; //Set the value at the index to the char passed in.
-        return 0; //Return 0 because no error.
+        return 1; //Return 1 because no error.
     }
 }
 
 struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState) {
     struct ca_data *ca = malloc(sizeof(struct ca_data)); //Allocate memory on the heap for the ca struct.
+    if(ca == NULL) return NULL; //Check to make sure the memory was allocated on the heap.
     ca->quiescentState = quiescentState; //Set ca's quiescent state to the passed in quiescent state.
     ca->numCells = numCells; //Set ca's number of cells to the passed in number of cells.
     ca->cells = malloc(sizeof(unsigned char) * numCells); //Allocate memory on the heap for the cells array.
+    if(ca->cells == NULL) return NULL; //Check to make sure the memory was allocated on the heap.
     init1DCA(ca, quiescentState); //Set all the values of the 1DCA to the quiescentState.
     return ca; //Return the pointer to the 1DCA that was created.
 }
@@ -74,6 +76,8 @@ void stepCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *
     for(int i = 0; i < numCells; i++) { //For each cell of the actual 1DCA.
         theDCA1D->cells[i] = ruleFunc(tempDCA1D, i+1); //Set the new value using result of ruleFunc given the padded 1DCA and an index offset of 1.
     }
+    free(tempDCA1D->cells); //Free the temporary cells array.
+    free(tempDCA1D); //Free the temporary 1DCA.
 }
 
 unsigned char rule110(struct ca_data *tempDCA1D, int index) {
