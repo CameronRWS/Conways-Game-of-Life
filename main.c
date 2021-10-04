@@ -7,7 +7,7 @@
 int main(int argc, char **argv) {
     //Checks to make sure the user entered in the correct number of arguments.
     if(argc != 6) { //If the argument count is not 6 (the first is the function name).
-        printf("Error: You need to supply 5 integer parameters. You supplied %d.\n", argc);
+        printf("Error: You need to supply 5 parameters. You supplied %d.\n", argc-1);
         return 1;
     }
     //The following 5 lines parse the user input.
