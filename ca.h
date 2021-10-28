@@ -11,8 +11,11 @@
  */
 typedef struct ca_data {
     unsigned char quiescentState;
-    int numCells;
-    unsigned char *cells;
+    int width;
+    int height;
+    unsigned char *cadata;
+    unsigned char wrap;
+    unsigned char dimension;
 } ca_data;
 
 /** 
@@ -67,7 +70,7 @@ struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState);
  *      function that will calculate the next state of each index.
  * Parameter: int flag - A variable for handling the edge cases of the 1DCA, 1 if 1DCA should wrap, 0 if not.
  */
-void stepCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index), int flag);
+void step1DCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index));
 
 /** 
  * Description: Calculates the next state of the indexed cell given the current state of the indexed cell
@@ -78,5 +81,14 @@ void stepCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *
  * Parameter: int index - The index of the cell that needs it's next state calculated.
  */
 unsigned char rule110(struct ca_data *tempDCA1D, int index);
+
+
+
+
+
+int set2DCACell(struct ca_data *theDCA1D, unsigned int index_x, unsigned int index_y, unsigned char charToSet);
+void step2DCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index_x, int index_y));
+struct ca_data* create2DCA(int width, int height, unsigned char quiescentState);
+
 
 #endif
