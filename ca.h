@@ -24,7 +24,7 @@ typedef struct ca_data {
  * Parameter: struct ca_data *theDCA1D - A pointer to the 1DCA struct that will be initiated.
  * Parameter: int quiescentState - The quiescent state to set the cells in the 1DCA to.
  */
-void init1DCA(struct ca_data *theDCA1D, int quiescentState);
+void initCA(struct ca_data *theDCA1D, int quiescentState);
 
 /* 
  * Description: Displays a 1DCA given a pointer to where the 1DCA is stored (struct ca_data).
@@ -53,7 +53,7 @@ int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char char
  * Parameter: unsigned char quiescentState - The quiescent (default) state of the 1DCA.
  * Returns: struct ca_data* - The pointer to the new 1DCA. Also returns NULL if memory couldn't be allocated.
  */
-struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState);
+struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState, unsigned int shouldWrapFlag);
 
 /** 
  * Description: Simulates one step of the 1DCA. It does this by creating a temporary 1DCA that
@@ -88,7 +88,8 @@ unsigned char rule110(struct ca_data *tempDCA1D, int index);
 
 int set2DCACell(struct ca_data *theDCA1D, unsigned int index_x, unsigned int index_y, unsigned char charToSet);
 void step2DCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index_x, int index_y));
-struct ca_data* create2DCA(int width, int height, unsigned char quiescentState);
+struct ca_data* create2DCA(int width, int height, unsigned char quiescentState, unsigned int shouldWrapFlag);
+void init1DCA(struct ca_data *theDCA1D, int quiescentState);
 
 
 #endif

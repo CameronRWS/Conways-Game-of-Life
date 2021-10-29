@@ -1,15 +1,26 @@
 #include <stdio.h> //Allows for use of printf.
 #include <stdlib.h> //Allows for use of free and malloc.
-#include "ca.h" //Allows for 1DCA usage.
+#include "ca.h" //Allows for 1DCA and 2DCA usage.
 
 /** 
- * Description: Initializes a 1DCA given a pointer to where the 1DCA is stored (struct ca_data).
- *      This function will set all values in the 1DCA to it's passed in quiescent state.
- * Parameter: struct ca_data *theDCA1D - A pointer to the 1DCA struct that will be initiated.
- * Parameter: int quiescentState - The quiescent state to set the cells in the 1DCA to.
+ * Description: Initializes a CA given a pointer to where the CA is stored (struct ca_data).
+ *      This function will set all values in the CA to it's passed in quiescent state.
+ * Parameter: struct ca_data *theDCA1D - A pointer to the CA struct that will be initiated.
+ * Parameter: int quiescentState - The quiescent state to set the cells in the CA to.
  */
-void init1DCA(struct ca_data *theDCA1D, int quiescentState) {
-    for(int i = 0; i < theDCA1D->width; i++) { //Go through each index of the cells.
+void initCA(struct ca_data *theDCA1D, int quiescentState) {
+    // printf("Got to init");
+    // printf("Width: %d,", theDCA1D->width);
+    // printf("Height: %d,", theDCA1D->height);
+    int maxIndex = 0;
+    if(theDCA1D->dimension == 1) {
+        maxIndex = theDCA1D->width;
+    } else {
+        maxIndex = theDCA1D->width * theDCA1D->height;
+    }
+    // printf("%d,", maxIndex);
+    for(int i = 0; i < maxIndex; i++) { //Go through each index of the cells.
+        // printf("%d,", i);
         theDCA1D->cadata[i] = quiescentState; //Set each cell to the quiescent state passed in.
     }
 }
@@ -54,15 +65,32 @@ int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char char
  * Parameter: unsigned char quiescentState - The quiescent (default) state of the 1DCA.
  * Returns: struct ca_data* - The pointer to the new 1DCA. Also returns NULL if memory couldn't be allocated.
  */
-struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState) {
+struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState, unsigned int shouldWrapFlag) {
     struct ca_data *ca = malloc(sizeof(struct ca_data)); //Allocate memory on the heap for the ca struct.
     if(ca == NULL) return NULL; //Check to make sure the memory was allocated on the heap.
     ca->quiescentState = quiescentState; //Set ca's quiescent state to the passed in quiescent state.
     ca->width = numCells; //Set ca's number of cells to the passed in number of cells.
+    ca->height = 0; //1DCA should have height of 0, since its not 2D.
+    ca->wrap = shouldWrapFlag; //Set ca's should wrap flag for access later.
+    ca->dimension = 1; //Set to 1DCA because thats important to the CA we are creating.
     ca->cadata = malloc(sizeof(unsigned char) * numCells); //Allocate memory on the heap for the cells array.
     if(ca->cadata == NULL) return NULL; //Check to make sure the memory was allocated on the heap.
-    init1DCA(ca, quiescentState); //Set all the values of the 1DCA to the quiescentState.
+    initCA(ca, quiescentState); //Set all the values of the 1DCA to the quiescentState.
     return ca; //Return the pointer to the 1DCA that was created.
+}
+
+struct ca_data* create2DCA(int width, int height, unsigned char quiescentState, unsigned int shouldWrapFlag) {
+    struct ca_data *ca = malloc(sizeof(struct ca_data)); //Allocate memory on the heap for the ca struct.
+    if(ca == NULL) return NULL; //Check to make sure the memory was allocated on the heap.
+    ca->quiescentState = quiescentState; //Set ca's quiescent state to the passed in quiescent state.
+    ca->width = width; //Set ca's number of cells to the passed in number of cells.
+    ca->height = height; //1DCA should have height of 0, since its not 2D.
+    ca->wrap = shouldWrapFlag; //Set ca's should wrap flag for access later.
+    ca->dimension = 2; //Set to 1DCA because thats important to the CA we are creating.
+    ca->cadata = malloc((sizeof(unsigned char)) * width * height); //Allocate memory on the heap for the cells array.
+    if(ca->cadata == NULL) return NULL; //Check to make sure the memory was allocated on the heap.
+    initCA(ca, quiescentState); //Set all the values of the 1DCA to the quiescentState.
+    return ca;
 }
 
 /** 
@@ -83,7 +111,7 @@ struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState) 
 void step1DCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index)) {
     int numCells = theDCA1D->width; //Store number of cells in the 1DCA for easy access (more readable code).
     //The following code creates a temporary 1DCA with 2 extra cells to better handle edge cases.
-    struct ca_data *tempDCA1D = create1DCA(numCells+2, theDCA1D->quiescentState);
+    struct ca_data *tempDCA1D = create1DCA(numCells+2, theDCA1D->quiescentState, theDCA1D->wrap);
     if(tempDCA1D == NULL) { //Check to make sure the 1DCA was created.
         printf("Error with create1DCA: Unable to allocate required memory for the temp 1DCA.\n");
         return;
@@ -144,4 +172,10 @@ unsigned char rule110(struct ca_data *tempDCA1D, int index) {
     }
     return r;
 }
+
+unsigned char ruleGameOfLife(struct ca_data *tempDCA1D, int x, int y) {
+
+}
+
+
 
