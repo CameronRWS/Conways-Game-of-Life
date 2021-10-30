@@ -31,11 +31,16 @@ void initCA(struct ca_data *theDCA1D, int quiescentState) {
  *      individually with a space in between.
  * Parameter: struct ca_data *theDCA1D - A pointer to the 1DCA struct that will be displayed.
  */
-void display1DCA(struct ca_data *theDCA1D) {
-    for(int i = 0; i < theDCA1D->width - 1; i++) { //For all cells within the 1DCA except the last one.
-        printf("%d ", theDCA1D->cadata[i]); //Print the char at each index with a space after it.
+void displayCA(struct ca_data *theDCA1D) {
+    int maxIndex = theDCA1D->width * theDCA1D->height;
+    for(int i = 0; i < maxIndex; i++) { //For all cells within the 1DCA except the last one.
+        if(i % (theDCA1D->width) == 0 && i != 0) {
+            printf("\n%d ", theDCA1D->cadata[i]); //Print the char at each index with a space after it.
+        } else {
+            printf("%d ", theDCA1D->cadata[i]); //Print the char at each index with a space after it.
+        }
     }
-    printf("%d\n", theDCA1D->cadata[theDCA1D->width - 1]); //Print last one without a space and add a new line.
+    printf("\n");
 }
 
 /** 
@@ -52,6 +57,27 @@ int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char char
         printf("Error with set1DCACell usage - index out of bounds. The 1DCA was not modified.\n");
         return 0; //Return 0 because of error.
     } else {      //If the index is within the bounds of the 1DCA, we can set it.
+        theDCA1D->cadata[index] = charToSet; //Set the value at the index to the char passed in.
+        return 1; //Return 1 because no error.
+    }
+}
+
+int set2DCACell(struct ca_data *theDCA1D, unsigned int index_x, unsigned int index_y, unsigned char charToSet) {
+    int index = index_x+index_y*theDCA1D->width;
+    if(!(0 <= index && index <= (theDCA1D->width*theDCA1D->height)-1)) { //If the index is not within the bounds of the cells.
+        printf("Error with set2DCACell usage - index out of bounds. The 2DCA was not modified.\n");
+        return 0; //Return 0 because of error.
+    } else {      //If the index is within the bounds of the 2DCA, we can set it.
+        theDCA1D->cadata[index] = charToSet; //Set the value at the index to the char passed in.
+        return 1; //Return 1 because no error.
+    }
+}
+
+int set2DCACellDebug(struct ca_data *theDCA1D, unsigned int index, unsigned char charToSet) {
+    if(!(0 <= index && index <= (theDCA1D->width*theDCA1D->height)-1)) { //If the index is not within the bounds of the cells.
+        printf("Error with set2DCACell usage - index out of bounds. The 2DCA was not modified.\n");
+        return 0; //Return 0 because of error.
+    } else {      //If the index is within the bounds of the 2DCA, we can set it.
         theDCA1D->cadata[index] = charToSet; //Set the value at the index to the char passed in.
         return 1; //Return 1 because no error.
     }
@@ -135,6 +161,31 @@ void step1DCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data
     free(tempDCA1D); //Free the temporary 1DCA.
 }
 
+void step2DCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index_x, int index_y)) {
+    //The following code creates a temporary 1DCA with 2 extra cells to better handle edge cases.
+    struct ca_data *tempDCA1D = create2DCA(theDCA1D->width, theDCA1D->height, theDCA1D->quiescentState, theDCA1D->wrap);
+    if(tempDCA1D == NULL) { //Check to make sure the 1DCA was created.
+        printf("Error with create2DCA: Unable to allocate required memory for the temp 2DCA.\n");
+        return;
+    }
+    //The following for loop copies the actual 2DCA's cells into the temporary 2DCA.
+    for(int x = 0; x < theDCA1D->width; x++) {
+        for(int y = 0; y < theDCA1D->height; y++) {
+            int index = x+(y*theDCA1D->width);
+            tempDCA1D->cadata[index] = theDCA1D->cadata[index];
+        }
+    }
+    //The following code goes through each cell of the actual 2DCA and calculates it's new value.
+    for(int y = 0; y < theDCA1D->height; y++) {
+        for(int x = 0; x < theDCA1D->width; x++) {
+            int index = x+(y*tempDCA1D->width);
+            theDCA1D->cadata[index] = ruleFunc(tempDCA1D, x, y);
+        }
+    }
+    free(tempDCA1D->cadata); //Free the temporary cells array.
+    free(tempDCA1D); //Free the temporary 1DCA.
+}
+
 /** 
  * Description: Calculates the next state of the indexed cell given the current state of the indexed cell
  *      and it's surrounding 2 cells (it's neighborhood). At this point the edge cases are already
@@ -174,7 +225,41 @@ unsigned char rule110(struct ca_data *tempDCA1D, int index) {
 }
 
 unsigned char ruleGameOfLife(struct ca_data *tempDCA1D, int x, int y) {
-
+    unsigned char n1, n2, n3, n4, n5, n6, n7, n8, c;
+    //Get neighbors.
+    c = tempDCA1D->cadata[x+(y*tempDCA1D->width)];
+    //return c+1;
+    if(tempDCA1D->wrap) {
+        n1 = tempDCA1D->cadata[(((x-1) + tempDCA1D->width) % tempDCA1D->width) + ((((y-1) + tempDCA1D->height) % tempDCA1D->height)*tempDCA1D->width)];
+        n2 = tempDCA1D->cadata[(((x) + tempDCA1D->width) % tempDCA1D->width) + ((((y-1) + tempDCA1D->height) % tempDCA1D->height)*tempDCA1D->width)];
+        n3 = tempDCA1D->cadata[(((x+1) + tempDCA1D->width) % tempDCA1D->width) + ((((y-1) + tempDCA1D->height) % tempDCA1D->height)*tempDCA1D->width)];
+        n4 = tempDCA1D->cadata[(((x-1) + tempDCA1D->width) % tempDCA1D->width) + ((((y) + tempDCA1D->height) % tempDCA1D->height)*tempDCA1D->width)];
+        n5 = tempDCA1D->cadata[(((x+1) + tempDCA1D->width) % tempDCA1D->width) + ((((y) + tempDCA1D->height) % tempDCA1D->height)*tempDCA1D->width)];
+        n6 = tempDCA1D->cadata[(((x-1) + tempDCA1D->width) % tempDCA1D->width) + ((((y+1) + tempDCA1D->height) % tempDCA1D->height)*tempDCA1D->width)];
+        n7 = tempDCA1D->cadata[(((x) + tempDCA1D->width) % tempDCA1D->width) + ((((y+1) + tempDCA1D->height) % tempDCA1D->height)*tempDCA1D->width)];
+        n8 = tempDCA1D->cadata[(((x+1) + tempDCA1D->width) % tempDCA1D->width) + ((((y+1) + tempDCA1D->height) % tempDCA1D->height)*tempDCA1D->width)];
+        //printf("Neighbors of: (%d, %d) i.e. %d -> (%d,%d,%d,%d,%d,%d,%d,%d)\n", x, y, c, n1, n2, n3, n4, n5, n6, n7, n8);
+    } else {
+        printf("Error with ruleGameOfLife: 2DCA's that do not wrap are not supported in Conway' game of life.\n");
+        return c;
+    }
+    int nc = n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8;
+    if(c == 1) {
+        if(nc == 2 || nc == 3) {
+            return 1;
+        } else {
+            return 0;
+        }
+    } else if (c == 0) {
+        if(nc == 3) {
+            return 1;
+        } else {
+            return 0;
+        }
+    } else {
+        printf("Error with ruleGameOfLife: Conway's game of life only supports cell values of 0 or 1.\n");
+        return 0;
+    }
 }
 
 
