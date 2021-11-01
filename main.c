@@ -35,6 +35,10 @@ int main(int argc, char **argv) {
                 printf("Error: The file does not contain enough integers for a %dx%d 2DCA.\n", rows, cols);
                 return 1; //Return 1 since there is an error.
             }
+            if(s != 0 && s != 1) {
+                printf("Error: The file contains a '%d' which is an unsupported character for Conway's Game of Life.", s);
+                return 1; //Return 1 since there is an error.
+            }
             set2DCACell(ca, y, x, s); //Set the associated cell to the read in int. y and x are flipped due to having to ensure the file matches what will eventually be printed.
         }
     }
