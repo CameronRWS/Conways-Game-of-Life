@@ -1,6 +1,6 @@
 main: main.o ca.o;
 	gcc main.o ca.o
-	mv a.out odca.out 
+	mv a.out gol.out 
 
 main.o: main.c ca.h
 	gcc -c main.c
