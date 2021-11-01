@@ -50,7 +50,9 @@ int main(int argc, char **argv) {
     }
     int shouldExit = 0; //Will store if the while loop should exit or not. Done for readability.
     char input; //Stores the char the user enters into the console.
+    //int sim = 0; //number of steps simulated.
     while(!shouldExit) { //While the loop shouldn't exit.
+        //printf("Steps: %d\n", sim++);
         displayCA(ca); //Display the current state of the CA.
         input = getchar(); //Get the next char in the console.
         if(input == '\n') { //If the char put in the console is the return char, simulate the CA once.
