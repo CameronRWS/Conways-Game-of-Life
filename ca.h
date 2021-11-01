@@ -21,7 +21,6 @@ typedef struct ca_data {
 void displayCA(struct ca_data *theDCA1D);
 int set1DCACell(struct ca_data *theDCA1D, unsigned int index, unsigned char charToSet);
 int set2DCACell(struct ca_data *theDCA1D, unsigned int index_x, unsigned int index_y, unsigned char charToSet);
-int set2DCACellDebug(struct ca_data *theDCA1D, unsigned int index, unsigned char charToSet);
 void initCA(struct ca_data *theDCA1D, int quiescentState);
 void step1DCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index));
 void step2DCA(struct ca_data *theDCA1D, unsigned char (*ruleFunc)(struct ca_data *tempDCA1D, int index_x, int index_y));
