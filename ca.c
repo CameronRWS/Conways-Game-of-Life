@@ -73,16 +73,6 @@ int set2DCACell(struct ca_data *theDCA1D, unsigned int index_x, unsigned int ind
     }
 }
 
-int set2DCACellDebug(struct ca_data *theDCA1D, unsigned int index, unsigned char charToSet) {
-    if(!(0 <= index && index <= (theDCA1D->width*theDCA1D->height)-1)) { //If the index is not within the bounds of the cells.
-        printf("Error with set2DCACell usage - index out of bounds. The 2DCA was not modified.\n");
-        return 0; //Return 0 because of error.
-    } else {      //If the index is within the bounds of the 2DCA, we can set it.
-        theDCA1D->cadata[index] = charToSet; //Set the value at the index to the char passed in.
-        return 1; //Return 1 because no error.
-    }
-}
-
 /** 
  * Description: Creates a 1DCA on the heap with the necessary memory space for the number of cells
  *      requested and also sets the value of each cell to the quiescent state. The number of cells
@@ -240,7 +230,7 @@ unsigned char ruleGameOfLife(struct ca_data *tempDCA1D, int x, int y) {
         n8 = tempDCA1D->cadata[(((x+1) + tempDCA1D->width) % tempDCA1D->width) + ((((y+1) + tempDCA1D->height) % tempDCA1D->height)*tempDCA1D->width)];
         //printf("Neighbors of: (%d, %d) i.e. %d -> (%d,%d,%d,%d,%d,%d,%d,%d)\n", x, y, c, n1, n2, n3, n4, n5, n6, n7, n8);
     } else {
-        printf("Error with ruleGameOfLife: 2DCA's that do not wrap are not supported in Conway' game of life.\n");
+        printf("Error: 2DCA's that do not wrap are not supported in Conway' Game of Life.\n");
         return c;
     }
     int nc = n1 + n2 + n3 + n4 + n5 + n6 + n7 + n8;
@@ -257,7 +247,7 @@ unsigned char ruleGameOfLife(struct ca_data *tempDCA1D, int x, int y) {
             return 0;
         }
     } else {
-        printf("Error with ruleGameOfLife: Conway's game of life only supports cell values of 0 or 1.\n");
+        printf("Error: Conway's Game of Life only supports cell values of 0 or 1. All cells that are not 0 or 1 are changed to 0.\n");
         return 0;
     }
 }
