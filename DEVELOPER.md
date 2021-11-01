@@ -6,7 +6,7 @@ This part of the project is an implementation of Conway's Game of Life.
 - struct ca_data -> A structure for storing a CA (cellular automata) - Contains a member/field for the quiescent state, width, height, should wrap flag, dimension, and array of cells. More details in ca.h
 
 ## Source Files
-##### main.c - Prompts the user for input then simulates the 1DCA.
+##### main.c - Prompts the user for input then simulates the CA.
 
 ##### ca.c - Contains functions for initializing, setting values of, displaying, creating, and simulating both 1DCA's and 2DCA's. As well as 2 stand alone function for calculating the next state of a cell in a 1DCA (rule110) or 2DCA (ruleGameOfLife).
 

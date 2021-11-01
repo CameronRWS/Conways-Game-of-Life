@@ -1,6 +1,6 @@
 #include <stdio.h> //Allows for printing to the console (printf).
 #include <stdlib.h> //Allows for getting user input as an integer (atoi).
-#include "ca.h" //Allows for 1DCA usage.
+#include "ca.h" //Allows for 1DCA and 2DCA usage.
 
 int main(int argc, char **argv) {
     //Checks to make sure the user entered in the correct number of arguments.
