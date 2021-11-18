@@ -1,12 +1,15 @@
-main: main.o ca.o;
-	gcc main.o ca.o
+main: main.o GraphicsClient.o CellularAutomaton.o;
+	g++ main.o GraphicsClient.o CellularAutomaton.o
 	mv a.out gol.out 
 
-main.o: main.c ca.h
-	gcc -c main.c
+main.o: main.cpp GraphicsClient.h CellularAutomaton.h
+	g++ -c main.cpp
 
-ca.o: ca.c ca.h
-	gcc -c ca.c
+GraphicsClient.o: GraphicsClient.cpp GraphicsClient.h
+	g++ -c GraphicsClient.cpp
+
+CellularAutomaton.o: CellularAutomaton.cpp CellularAutomaton.h GraphicsClient.h
+	g++ -c CellularAutomaton.cpp
 
 clean: 
 	rm *.o

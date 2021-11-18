@@ -1,53 +1,84 @@
-# COMS 327 - Project 1 Part C
-This part of the project is an implementation of Conway's Game of Life.
+# COMS 327 - Project 2 Part A
+This part of the project is an implementation of Conway's Game of Life displayed graphically.
 
 ## Key Datastructures
 
-- struct ca_data -> A structure for storing a CA (cellular automata) - Contains a member/field for the quiescent state, width, height, should wrap flag, dimension, and array of cells. More details in ca.h
+- CellularAutomaton.cpp
+- GraphicsClient.cpp
 
 ## Source Files
-##### main.c - Prompts the user for input then simulates the CA.
+##### main.cpp - Connects to a GraphicsServer and simulates a Cellular Automaton.
 
-##### ca.c - Contains functions for initializing, setting values of, displaying, creating, and simulating both 1DCA's and 2DCA's. As well as 2 stand alone function for calculating the next state of a cell in a 1DCA (rule110) or 2DCA (ruleGameOfLife).
+- Also contains a function for calculating the next state of a cell in a Cellular Automaton. This step function is based on Conway's Game of Life.
 
-- void initCA(struct ca_data *theCA, int quiescentState) -> Initializes a CA given a pointer to where the CA is stored (struct ca_data). This function will set all values in the CA to it's passed in quiescent state.
+##### CellularAutomaton.cpp - Contains the implementation of a Cellular Automaton. Includes the various functions for working with a Cellular Automaton per assignment specifications.
 
-- void displayCA(struct ca_data *theCA) -> Displays a CA given a pointer to where the CA is stored (struct ca_data). It does so by iterating through each char of the CA and printing each one individually with a space in between.
+- void CellularAutomaton::initCA() -> Initiates the CA by setting all cells to the quiescent state.
 
-- int set1DCACell(struct ca_data *theCA, unsigned int index, unsigned char charToSet) -> Sets the value of a CA's cell given a pointer to the CA (struct ca_data), the index you want to set, and the char to set the cell to. Checks that the passed in index is within bounds of the CA.
+- void CellularAutomaton::displayCAToConsole() -> Displays the state of the CA to the console (like in project 1 part c). This method is used for debugging.
 
-- int set2DCACell(struct ca_data *theCA, unsigned int index_x, unsigned int index_y, unsigned char charToSet) -> Sets the value of a CA's cell given a pointer to the CA (struct ca_data), the index you want to set (the x and y position), and the char to set the cell to. Checks that the passed in index is within bounds of the CA.
+- void CellularAutomaton::displayCA(GraphicsClient* gc) -> Displays the state of the CA to the passed in GraphicsClient.
 
-- void step1DCA(struct ca_data *theCA, unsigned char (*ruleFunc)(struct ca_data *tempCA, int index)) -> Simulates one step of the 1DCA. It does this by creating a temporary CA that has an additional 2 cells (one on each end of the original CA) and copying the values from the original CA into the temporary CA (starting at index 1 and ending 1 cell before the end) and then depending on the value of flag it sets the starting and ending cell. After creating this temporary CA (for the purpose of being able to calculate the neighborhood of the original CA nicely), the function goes through each index of the temporary CA (starting at index 1 and ending 1 cell before the end) and using the passed in rule function calculates the next state of indexed cell. It then frees the temporary CA's memory as it's no longer needed.
+- int CellularAutomaton::set2DCACell(unsigned int index_x, unsigned int index_y, unsigned char charToSet) -> Sets the value of a cell in the CA.
 
-- void step2DCA(struct ca_data *theCA, unsigned char (*ruleFunc)(struct ca_data *tempCA, int index_x, int index_y)) -> Simulates one step of the 2DCA. It does this by creating a temporary CA that has the values of the original CA that gets used to calculate the values for the next step of the CA. No need for any padding cells in this 2DCA.
+- void CellularAutomaton::step2DCA(unsigned char (*ruleFunc)(CellularAutomaton *tempCA, int index_x, int index_y)) -> Calculates the next state of the CA given a step function.
 
-- struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState, unsigned int shouldWrapFlag) -> Creates a 1DCA on the heap with the necessary memory space for the number of cells requested and also sets the value of each cell to the quiescent state. The number of cells, quiescent state, and should wrap flag is also stored in the created 1DCA for convenience.
+- CellularAutomaton::CellularAutomaton(int width, int height, unsigned char quiescentState, unsigned char shouldWrapFlag) -> A constructor for a CA that doesn't use a file to create the initial state.
 
-- struct ca_data* create2DCA(int width, int height, unsigned char quiescentState, unsigned int shouldWrapFlag) -> Creates a 2DCA on the heap with the necessary memory space for the number of cells requested and also sets the value of each cell to the quiescent state. The width, height, quiescent state, and should wrap flag is also stored in the created 2DCA for convenience.
+- CellularAutomaton::CellularAutomaton(string fileName, int quiescentState) -> A constructor for a CA that doesn't use a file to create the initial state.
 
-- unsigned char rule110(struct ca_data *tempCA, int index) -> Calculates the next state of the indexed cell given the current state of the indexed cell and it's surrounding 2 cells (it's neighborhood). At this point the edge cases are already taken care of, and the client only asks for indices that have neighbors.
+- CellularAutomaton::CellularAutomaton(const CellularAutomaton& originalCA) -> A copy constructor for a CA.
 
-- unsigned char ruleGameOfLife(struct ca_data *tempCA, int x, int y) -> Calculates the next state of the indexed cell given the current state of the indexed cell and it's surrounding 8 cells (it's neighborhood). Rule is based off of Conway's Game of Life.
+- CellularAutomaton::~CellularAutomaton() -> A destructor for a CA.
 
-##### ca.h - Contains function signatures for ca.c. See ca.c for a description of each function.
+- CellularAutomaton& CellularAutomaton::operator=(const CellularAutomaton& toCopyCA) -> A copy assignment overload function for the CA.
 
-- void displayCA(struct ca_data *theCA)
+- int CellularAutomaton::getQuiescentState() -> A getter for the CA's quiescent state.
 
-- int set1DCACell(struct ca_data *theCA, unsigned int index, unsigned char charToSet)
+- int CellularAutomaton::getWidth() -> A getter for the CA's width.
 
-- int set2DCACell(struct ca_data *theCA, unsigned int index_x, unsigned int index_y, unsigned char charToSet)
+- int CellularAutomaton::getHeight() -> A getter for the CA's height.
 
-- void initCA(struct ca_data *theCA, int quiescentState)
+- unsigned char* CellularAutomaton::getCAdata() -> A getter for the CA's cell data.
 
-- void step1DCA(struct ca_data *theCA, unsigned char (*ruleFunc)(struct ca_data *tempCA, int index))
+- unsigned char CellularAutomaton::getWrap() -> A getter for the CA's wrap flag.
 
-- void step2DCA(struct ca_data *theCA, unsigned char (*ruleFunc)(struct ca_data *tempCA, int index_x, int index_y))
+##### CellularAutomaton.h - Contains the class definition of a Cellular Automaton.
 
-- struct ca_data* create1DCA(unsigned int numCells, unsigned char quiescentState, unsigned int shouldWrapFlag)
+##### GraphicsClient.cpp - Contains the implementation for a Graphics Client. Includes the various functions for working with a Graphics Client per assignment specifications.
 
-- struct ca_data* create2DCA(int width, int height, unsigned char quiescentState, unsigned int shouldWrapFlag)
+- GraphicsClient::GraphicsClient(string URL, int port) -> A parameterized constructor for a GraphicsClient object.
 
-- unsigned char rule110(struct ca_data *tempCA, int index)
+- GraphicsClient::GraphicsClient(const GraphicsClient& originalGC) -> A copy constructor for a GraphicsClient object.
 
-- unsigned char ruleGameOfLife(struct ca_data *tempCA, int x, int y)
+- GraphicsClient::~GraphicsClient() -> A destructor for a GraphicsClient object.
+
+- GraphicsClient& GraphicsClient::operator=(const GraphicsClient& toCopyGC) -> A copy operator for a GraphicsClient object.
+
+- void GraphicsClient::setBackgroundColor(int r, int g, int b) -> Sets the background color of the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::setDrawingColor(int r, int g, int b) -> Sets the drawing color of the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::clear() -> Clears the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::setPixel(int x, int y, int r, int g, int b) -> Sets the color of a pixel of the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::drawRectangle(int x, int y, int w, int h)  -> Draws an outline of a rectangle on the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::fillRectangle(int x, int y, int w, int h) -> Draws a filled rectangle on the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::clearRectangle(int x, int y, int w, int h) -> Draws a filled rectangle with the color of the background on the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::drawOval(int x, int y, int w, int h) -> Draws an outline of an oval on the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::fillOval(int x, int y, int w, int h) -> Draws an filled in an oval on the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::drawLine(int x1, int y1, int x2, int y2) -> Draws a line on the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::drawShapeHelper(int c, int x, int y, int w, int h) -> Draws a shape on the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::drawstring(int x, int y, string stringToDraw) -> Draws a string on the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+- void GraphicsClient::repaint() -> Repaints (updates) the associated graphics display for the GraphicsClient object by communicating to the GraphicsServer based off of the project specifications and communication document provided.
+
+##### GraphicsClient.h - Contains the class definition of a Graphics Client.

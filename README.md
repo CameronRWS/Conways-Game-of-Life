@@ -1,5 +1,5 @@
-# COMS 327 - Project 1 Part C
-This part of the project is an implementation of Conway's Game of Life.
+# COMS 327 - Project 2 Part A
+This part of the project is an implementation of Conway's Game of Life displayed on a graphics server.
 
 ## Features Implemented
 
