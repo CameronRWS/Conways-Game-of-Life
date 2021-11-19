@@ -1,12 +1,12 @@
 
-#include "GraphicsClient.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <string>
-#include <iostream>
+#include "GraphicsClient.h" //Graphics client header.
+#include <stdio.h> //From socket code for input/output in C.
+#include <stdlib.h> //From socket code.
+#include <sys/socket.h> //From socket code
+#include <arpa/inet.h> //From socket code
+#include <unistd.h> //From socket code
+#include <string> //For using strings.
+#include <iostream> //input/output in C++ (not the same as stdio.h).
 
 using namespace std;
 
@@ -24,11 +24,11 @@ GraphicsClient::GraphicsClient(string URL, int port) {
     }
     memset(&this->serv_addr, '0', sizeof(this->serv_addr));
     this->serv_addr.sin_family = AF_INET;
-    this->serv_addr.sin_port = htons(port);
+    this->serv_addr.sin_port = htons(this->port);
     if(inet_pton(AF_INET, URL.c_str(), &this->serv_addr.sin_addr) <= 0) {
         fprintf(stderr, "Invalid address/ Address not supported \n");
     }
-    if (connect(sockfd, (struct sockaddr *)&this->serv_addr, sizeof(this->serv_addr)) < 0) {
+    if (connect(this->sockfd, (struct sockaddr *)&this->serv_addr, sizeof(this->serv_addr)) < 0) {
         fprintf(stderr, "Connection Failed \n");
     }
 }
@@ -46,11 +46,11 @@ GraphicsClient::GraphicsClient(const GraphicsClient& originalGC) {
     }
     memset(&this->serv_addr, '0', sizeof(this->serv_addr));
     this->serv_addr.sin_family = AF_INET;
-    this->serv_addr.sin_port = htons(port);
+    this->serv_addr.sin_port = htons(this->port);
     if(inet_pton(AF_INET, URL.c_str(), &this->serv_addr.sin_addr) <= 0) {
         fprintf(stderr, "Invalid address/ Address not supported \n");
     }
-    if (connect(sockfd, (struct sockaddr *)&this->serv_addr, sizeof(this->serv_addr)) < 0) {
+    if (connect(this->sockfd, (struct sockaddr *)&this->serv_addr, sizeof(this->serv_addr)) < 0) {
         fprintf(stderr, "Connection Failed \n");
     }
 }
@@ -68,10 +68,23 @@ GraphicsClient::~GraphicsClient() {
  */
 GraphicsClient& GraphicsClient::operator=(const GraphicsClient& toCopyGC) {
     if (this != &toCopyGC) {
+        close(this->sockfd); //close existing connection
+        //Creates new connection with the parameters from RHS (toCopyGC).
         this->URL = toCopyGC.URL;
         this->port = toCopyGC.port;
-        this->sockfd = toCopyGC.sockfd;
-        this->serv_addr = toCopyGC.serv_addr;
+        this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
+        if (sockfd < 0) {
+            fprintf(stderr, "Error creating socket \n");
+        }
+        memset(&this->serv_addr, '0', sizeof(this->serv_addr));
+        this->serv_addr.sin_family = AF_INET;
+        this->serv_addr.sin_port = htons(this->port);
+        if(inet_pton(AF_INET, URL.c_str(), &this->serv_addr.sin_addr) <= 0) {
+            fprintf(stderr, "Invalid address/ Address not supported \n");
+        }
+        if (connect(this->sockfd, (struct sockaddr *)&this->serv_addr, sizeof(this->serv_addr)) < 0) {
+            fprintf(stderr, "Connection Failed \n");
+        }
     }
     return *this;
 }
@@ -280,7 +293,7 @@ void GraphicsClient::drawShapeHelper(int c, int x, int y, int w, int h) {
     message[19] = (char) ((h >> 8) & 0x0F); //get next 4 bits
     message[20] = (char) ((h >> 4) & 0x0F); //get next next 4 bits
     message[21] = (char) (h & 0x0F); //get last 4 bits
-    send(sockfd, message, 22, 0);
+    send(sockfd, message, 22, 0); 
 }
 
 /**
@@ -291,8 +304,12 @@ void GraphicsClient::drawShapeHelper(int c, int x, int y, int w, int h) {
  * Parameter: stringToDraw - The string to draw on the graphics display.
  */
 void GraphicsClient::drawstring(int x, int y, string stringToDraw) {
-    int len = stringToDraw.length();
-    char message[100+len*2]; //message on the stack
+    int len = stringToDraw.length(); //get the length of the string to draw for message length calculation.
+    if(len > 16535) { //16535 is max number of characters per message format protocol.
+        printf("Error: Message has exceeded payload limit of 16,535 characters.");
+        return;
+    }
+    char message[100+len*2]; //message on the stack, more than enough space created.
     int mesLen = 0x09 + (2*len);
     message[0] = 0xFF;
     message[1] = (char) ((mesLen >> 12) & 0x0F);
@@ -308,11 +325,11 @@ void GraphicsClient::drawstring(int x, int y, string stringToDraw) {
     message[11] = (char) ((y >> 8) & 0x0F); //get next 4 bits
     message[12] = (char) ((y >> 4) & 0x0F); //get next next 4 bits
     message[13] = (char) (y & 0x0F); //get last 4 bits
-    for(int i = 0; i < len; i++) {
+    for(int i = 0; i < len; i++) { //for each character to draw
         message[14+(i*2)] = (char) ((stringToDraw[i] >> 4) & 0x0F); //get first 4 bits
         message[15+(i*2)] = (char) (stringToDraw[i] & 0x0F); //get last 4 bits
     }
-    send(sockfd, message, 0x09 + (2*len) + 5, 0);
+    send(sockfd, message, 0x09 + (2*len) + 5, 0); //9 for index 5-13, 5 for index 0-4, and 2*len for each char being split up into two nibbles.
 }
 
 /**

@@ -1,9 +1,9 @@
 #include <stdio.h> //Allows for use of printf.
-#include <cstdlib>
-#include <string>
+#include <cstdlib> //For certain utility functions.
+#include <string> //For using strings.
 #include "CellularAutomaton.h" //Allows for 2DCA usage.
-#include "GraphicsClient.h"
-#include <math.h>
+#include "GraphicsClient.h" //Graphics client header.
+#include <math.h> //For use of floor.
 
 using namespace std;
 

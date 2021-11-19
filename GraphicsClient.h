@@ -1,10 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <string.h>
-#include <iostream>
+#include <stdio.h> //From socket code for input/output in C.
+#include <stdlib.h> //From socket code.
+#include <sys/socket.h> //From socket code
+#include <arpa/inet.h> //From socket code
+#include <unistd.h> //From socket code
+#include <string> //For using strings.
+#include <iostream> //input/output in C++ (not the same as stdio.h).
 using namespace std;
 
 #ifndef GC_HEADER
