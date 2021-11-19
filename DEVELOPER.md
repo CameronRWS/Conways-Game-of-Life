@@ -3,8 +3,8 @@ This part of the project is an implementation of Conway's Game of Life displayed
 
 ## Key Datastructures
 
-- CellularAutomaton.cpp
-- GraphicsClient.cpp
+- CellularAutomaton.h - Stores a CA in a convenient class with various methods to modify the CA.
+- GraphicsClient.h - Convenient class for communicating with a graphics server via various drawing methods. This class encapsulates what a window created by the graphics server is.
 
 ## Source Files
 ##### main.cpp - Connects to a GraphicsServer and simulates a Cellular Automaton.

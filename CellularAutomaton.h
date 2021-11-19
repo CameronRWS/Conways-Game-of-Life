@@ -8,7 +8,7 @@ using namespace std;
 #define CA_HEADER
 
 /** 
- * Description: Stores a CA in a convenient class.
+ * Description: Stores a CA in a convenient class with various methods to modify the CA.
  */
 class CellularAutomaton {
     public:

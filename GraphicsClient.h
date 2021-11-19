@@ -10,6 +10,10 @@ using namespace std;
 #ifndef GC_HEADER
 #define GC_HEADER
 
+/**
+ * Description: Convenient class for communicating with a graphics server via various drawing methods. 
+ *  This class encapsulates what a window created by the graphics server is.
+ */
 class GraphicsClient {
     public:
         /**
