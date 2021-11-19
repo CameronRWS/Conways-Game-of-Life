@@ -337,7 +337,7 @@ void GraphicsClient::drawstring(int x, int y, string stringToDraw) {
  *  by communicating to the GraphicsServer based off of the project specifications and communication document provided.
  */
 void GraphicsClient::repaint() {
-    char message[100];
+    char message[100]; //message on the stack
     message[0] = 0xFF;
     message[1] = 0x00;
     message[2] = 0x00;
