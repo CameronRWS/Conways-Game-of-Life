@@ -28,11 +28,11 @@ int main(int argc, char **argv) {
     int shouldExit = 0; //Will store if the while loop should exit or not. Done for readability.
     char input; //Stores the char the user enters into the console.
     while(!shouldExit) { //While the loop shouldn't exit.
-        fflush(stdin);
-        gc.clear();
+        fflush(stdin); //clean out the input.
+        gc.clear(); //wipe the screen to the background color.
         ca.displayCA(&gc); //Display the current state of the CA.
-        //ca.displayCAToConsole();
-        gc.repaint();
+        //ca.displayCAToConsole(); debugging purposes
+        gc.repaint(); //Update the display.
         input = getchar(); //Get the next char in the console.
         if(input == '\n') { //If the char put in the console is the return char, simulate the CA once.
             ca.step2DCA(&ruleGameOfLife);
