@@ -195,7 +195,7 @@ CellularAutomaton::CellularAutomaton(const CellularAutomaton& originalCA) {
  * Description: A destructor for a CA.
  */
 CellularAutomaton::~CellularAutomaton() {
-    delete this->cadata; //Free the cells array.
+    delete this->cadata; //Free the cells array that were put on the heap.
 }
 
 /**

@@ -4,7 +4,15 @@
 #include <iostream>
 using namespace std;
 
-unsigned char ruleGameOfLife(CellularAutomaton *tempCA, int x, int y);
+/** 
+ * Description: Calculates the next state of the indexed cell given the current state of the indexed cell
+ *      and it's surrounding 8 cells (it's neighborhood). Rule is based off of Conway's Game of Life.
+ * Parameter: CellularAutomaton *tempCA - A pointer to the temporary CA object that holds the 
+ *      original CA.
+ * Parameter: int x - The x position of the cell that needs it's next state calculated.
+ * Parameter: int y - The y position of the cell that needs it's next state calculated.
+ */
+unsigned char ruleGameOfLife(CellularAutomaton *tempCA, int x, int y); //Defined under main method.
 
 int main(int argc, char **argv) {
     //Checks to make sure the user entered in the correct number of arguments.
@@ -35,20 +43,6 @@ int main(int argc, char **argv) {
     printf("Program has exited!\n");
     return 0;
 }
-
-// int main() {
-//     CellularAutomaton ca = CellularAutomaton("./examples/blinker.txt", 0);
-//     CellularAutomaton ca2 = CellularAutomaton("./examples/stable.txt", 0);
-//     ca.displayCAToConsole();
-//     printf("\n");
-//     ca2.displayCAToConsole();
-//     printf("\n");
-//     //ca2 = ca;
-//     ca2.displayCAToConsole();
-
-//     printf("Program has exited!\n");
-//     return 0;
-// }
 
 /** 
  * Description: Calculates the next state of the indexed cell given the current state of the indexed cell

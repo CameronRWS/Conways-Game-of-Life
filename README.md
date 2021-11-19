@@ -1,5 +1,5 @@
 # COMS 327 - Project 2 Part A
-This part of the project is an implementation of Conway's Game of Life displayed on a graphics server.
+This part of the project is an implementation of Conway's Game of Life displayed on a graphics window.
 
 ## Features Implemented
 
@@ -8,7 +8,9 @@ This part of the project is an implementation of Conway's Game of Life displayed
 3. Set the value of a specific cell in a CA
 4. Simulate 1 step of a CA
 6. Defines rules for simulating CA
-7. Prompt user for input related to simulating a CA using rules from Conway's Game of Life
+7. Allows for filepath input for defining a CA
+8. GraphicsClient class implementation for easily communicating with a graphics window. (methods defined from project specifications)
+9. Main program for simulating the CA on the graphics window.
 
 ## Known Errors and Issues
 
@@ -22,7 +24,7 @@ make
 ```
 Run this command to run the project.
 ```sh
-./gol.out <integer for the dimension of CA (1 or 2)> <string for file path to initial state of the 2DCA>
+./gol.out <text file path to CA definition (string)>
 ```
 Run this command to clean the project (remove *.o and *.out files).
 ```sh
