@@ -7,8 +7,77 @@
 #include <unistd.h> //From socket code
 #include <string> //For using strings.
 #include <iostream> //input/output in C++ (not the same as stdio.h).
-
+#include <sys/ioctl.h>
+#include <math.h> //For use of floor.
 using namespace std;
+
+void GraphicsClient::getMessage() {
+    int count; //number of bytes that can be read.
+    ioctl(this->sockfd, FIONREAD, &count); 
+    if(count == 0) {
+        return;
+    }
+    printf("count: %d\n", count);
+    char message[count];
+    read(this->sockfd, message, count);
+    printf("raw message: ");
+    for(int i = 0; i < count; i++) {
+        printf("%d ", message[i]);
+    }
+    printf("\n");
+    for(int i = 0; i < count; i++) {
+        if(message[i] == -1) {
+            int len1 = message[i+1] << 12;//<< 12 //*4096
+            int len2 = message[i+2] << 8;// << 8 //* 256
+            int len3 = message[i+3] << 4; //<< 4 //* 16
+            int len4 = message[i+4];
+            int len = len1 + len2 + len3 + len4;
+            printf("len: %d\n", len);
+            if(message[i+5] == 0x03) { //click
+                printf("click!\n");
+                int x1 = message[i+7] << 12;
+                int x2 = message[i+8] << 8;
+                int x3 = message[i+9] << 4;
+                int x4 = message[i+10];
+                int y1 = message[i+11] << 12;
+                int y2 = message[i+12] << 8;
+                int y3 = message[i+13] << 4;
+                int y4 = message[i+14];
+                int x = x1 + x2 + x3 + x4;
+                int y = y1 + y2 + y3 + y4;
+            } else if(message[i+5] == 0x0A) { //file
+                printf("file!\n");
+                int filePathLen = (len-1)/2; //-1 to remove the file command and /2 since each char takes up 2 nibbles.
+                string filePath = "";
+                for(int j = 0; j < filePathLen; j++) {
+                    int chr1 = message[i+6+(j*2)] << 4;
+                    int chr2 = message[i+7+(j*2)];
+                    int chr = chr1 + chr2;
+                    filePath = filePath + (char)chr;
+                }
+                printf("\n");
+                printf("string: '%s'\n", filePath.c_str());
+            }
+            i = i + len; //skip over the read characters. 
+        }
+    }
+    printf("message read done.\n");
+}
+
+void GraphicsClient::drawGUI() {
+    
+}
+
+void GraphicsClient::requestFile() {
+    char message[100]; //message on the stack
+    message[0] = 0xFF;
+    message[1] = 0x00;
+    message[2] = 0x00;
+    message[3] = 0x00;
+    message[4] = 0x01; //length 1
+    message[5] = 0x0E; //request file
+    send(sockfd, message, 6, 0);
+}
 
 /**
  * Description: A parameterized constructor for a GraphicsClient object.
@@ -346,3 +415,4 @@ void GraphicsClient::repaint() {
     message[5] = 0x0C; //repaint/update server code.
     send(sockfd, message, 6, 0);
 }
+
