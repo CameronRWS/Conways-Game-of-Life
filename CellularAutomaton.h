@@ -1,15 +1,15 @@
 
 #include <string>
-#include "GraphicsClient.h"
 
 using namespace std;
 
 #ifndef CA_HEADER
 #define CA_HEADER
-
+#include "GraphicsClient.h" //Graphics client header.
 /** 
  * Description: Stores a CA in a convenient class with various methods to modify the CA.
  */
+class GraphicsClient;
 class CellularAutomaton {
     public:
         /**
@@ -92,6 +92,9 @@ class CellularAutomaton {
          * Returns: unsigned char - The wrap flag of the CA.
          */
         unsigned char getWrap();
+
+        void stepAndDisplayCA(GraphicsClient* gc);
+        void randomize();
     private:
         //Member/Field: int quiescentState - The quiescent (default) state of the CA.
         int quiescentState;

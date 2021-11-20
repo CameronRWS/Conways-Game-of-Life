@@ -2,6 +2,7 @@
     "files.associations": {
         "string.h": "c",
         "ostream": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "string": "cpp"
     }
 }

@@ -5,7 +5,7 @@ main: main.o GraphicsClient.o CellularAutomaton.o;
 main.o: main.cpp GraphicsClient.h CellularAutomaton.h
 	g++ -c main.cpp
 
-GraphicsClient.o: GraphicsClient.cpp GraphicsClient.h
+GraphicsClient.o: GraphicsClient.cpp GraphicsClient.h CellularAutomaton.h
 	g++ -c GraphicsClient.cpp
 
 CellularAutomaton.o: CellularAutomaton.cpp CellularAutomaton.h GraphicsClient.h

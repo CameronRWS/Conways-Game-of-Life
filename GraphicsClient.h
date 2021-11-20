@@ -9,11 +9,12 @@ using namespace std;
 
 #ifndef GC_HEADER
 #define GC_HEADER
-
+#include "CellularAutomaton.h" //Allows for 2DCA usage.
 /**
  * Description: Convenient class for communicating with a graphics server via various drawing methods. 
  *  This class encapsulates what a window created by the graphics server is.
  */
+class CellularAutomaton;
 class GraphicsClient {
     public:
         /**
@@ -147,8 +148,17 @@ class GraphicsClient {
          */
         void drawShapeHelper(int c, int x, int y, int w, int h);
         void drawGUI();
-        void getMessage();
+        string getMessage(CellularAutomaton* ca);
+        string clickEvent(int x, int y, CellularAutomaton* ca);
         void requestFile();
+        void drawButton(int x, int y, int w, int h, string name);
+        int getShouldReset();
+        int getShouldRefresh();
+        int getShouldExit();
+        void setShouldReset(int shouldReset);
+        void setShouldRefresh(int shouldRefresh);
+        void setShouldExit(int shouldExit);
+        void clearGame();
     private:
         //Member/Field: string URL - The URL to the GraphicsClient connects to.
         string URL;
@@ -158,6 +168,10 @@ class GraphicsClient {
         int sockfd;
         //Member/Field: sockaddr_in serv_addr - The server address the GraphicsClient connects to.
         struct sockaddr_in serv_addr;
+
+        int shouldRefresh;
+        int shouldReset;
+        int shouldExit;
 };
 
 #endif

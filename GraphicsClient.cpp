@@ -1,5 +1,4 @@
 
-#include "GraphicsClient.h" //Graphics client header.
 #include <stdio.h> //From socket code for input/output in C.
 #include <stdlib.h> //From socket code.
 #include <sys/socket.h> //From socket code
@@ -9,22 +8,107 @@
 #include <iostream> //input/output in C++ (not the same as stdio.h).
 #include <sys/ioctl.h>
 #include <math.h> //For use of floor.
+#include "GraphicsClient.h" //Graphics client header.
+
+
+
+const int padding = 4; //padding for GUI.
+const int gui_w = 200;
+const int game_w = 600;
+const int game_h = 600;
+const int btn_w = 80;
+const int btn_h = 40;
+const int all_btn_x = game_w+60;
+const int btn_gap = 45;
+const int step_btn_y   = 10+(btn_gap*0);
+const int run_btn_y    = 10+(btn_gap*1);
+const int pause_btn_y  = 10+(btn_gap*2);
+const int reset_btn_y  = 10+(btn_gap*3);
+const int random_btn_y = 10+(btn_gap*4);
+const int clear_btn_y  = 10+(btn_gap*5);
+const int load_btn_y   = 10+(btn_gap*6);
+const int quit_btn_y   = 10+(btn_gap*7);
+const int size1_btn_y  = 10+(btn_gap*8);
+const int size2_btn_y  = 10+(btn_gap*9);
+const int size3_btn_y  = 10+(btn_gap*10);
+const int repaint_btn_y = 10+(btn_gap*11);
+
+
+
 using namespace std;
 
-void GraphicsClient::getMessage() {
+
+int GraphicsClient::getShouldReset() {
+    return this->shouldReset;
+}
+
+void GraphicsClient::setShouldReset(int shouldReset) {
+    this->shouldReset = shouldReset;
+}
+
+int GraphicsClient::getShouldRefresh() {
+    return this->shouldRefresh;
+}
+
+void GraphicsClient::setShouldRefresh(int shouldRefresh) {
+    this->shouldRefresh = shouldRefresh;
+}
+
+int GraphicsClient::getShouldExit() {
+    return this->shouldExit;
+}
+
+void GraphicsClient::setShouldExit(int shouldExit) {
+    this->shouldExit= shouldExit;
+}
+
+void GraphicsClient::clearGame() {
+    this->setDrawingColor(0,0,0); //set to black
+    this->fillRectangle(0, 0, 600, 800); //wipe playable screen. (black)
+    this->setDrawingColor(0,200,20); //go back to green.
+}
+
+string GraphicsClient::clickEvent(int x, int y, CellularAutomaton* ca) {
+    printf("click at: (%d, %d)", x, y);
+    if(x > all_btn_x && x < all_btn_x + btn_w) {
+        if(y > step_btn_y && y < step_btn_y + btn_h) {
+            ca->stepAndDisplayCA(this);
+            this->setShouldRefresh(0); //stop auto simulate.
+        } else if(y > run_btn_y && y < run_btn_y + btn_h) {
+            this->shouldRefresh = 1;
+        } else if(y > pause_btn_y && y < pause_btn_y + btn_h) {
+            this->shouldRefresh = 0;
+        } else if(y > reset_btn_y && y < reset_btn_y + btn_h) {
+            this->shouldReset = 1;
+        } else if(y > random_btn_y && y < random_btn_y + btn_h) {
+            ca->randomize();
+            ca->displayCA(this);
+        } else if(y > clear_btn_y && y < clear_btn_y + btn_h) {
+            ca->initCA();
+            ca->displayCA(this);
+        } else if(y > load_btn_y && y < load_btn_y + btn_h) {
+            this->requestFile();
+        } else if(y > quit_btn_y && y < quit_btn_y + btn_h) {
+            this->shouldExit = 1;
+        } else if(y > size1_btn_y && y < size1_btn_y + btn_h) {
+            return "./predefinedCAs/40by40.txt";
+        } else if(y > size2_btn_y && y < size2_btn_y + btn_h) {
+            return "./predefinedCAs/150by150.txt";
+        } else if(y > size3_btn_y && y < size3_btn_y + btn_h) {
+            return "./predefinedCAs/600by600.txt";
+        } else if(y > repaint_btn_y && y < repaint_btn_y + btn_h) {
+            this->repaint();
+        }  
+    }
+    return "";
+}
+
+string GraphicsClient::getMessage(CellularAutomaton* ca) {
     int count; //number of bytes that can be read.
     ioctl(this->sockfd, FIONREAD, &count); 
-    if(count == 0) {
-        return;
-    }
-    printf("count: %d\n", count);
+    if(count == 0) { return ""; }
     char message[count];
     read(this->sockfd, message, count);
-    printf("raw message: ");
-    for(int i = 0; i < count; i++) {
-        printf("%d ", message[i]);
-    }
-    printf("\n");
     for(int i = 0; i < count; i++) {
         if(message[i] == -1) {
             int len1 = message[i+1] << 12;//<< 12 //*4096
@@ -45,6 +129,7 @@ void GraphicsClient::getMessage() {
                 int y4 = message[i+14];
                 int x = x1 + x2 + x3 + x4;
                 int y = y1 + y2 + y3 + y4;
+                return this->clickEvent(x, y, ca);
             } else if(message[i+5] == 0x0A) { //file
                 printf("file!\n");
                 int filePathLen = (len-1)/2; //-1 to remove the file command and /2 since each char takes up 2 nibbles.
@@ -57,15 +142,47 @@ void GraphicsClient::getMessage() {
                 }
                 printf("\n");
                 printf("string: '%s'\n", filePath.c_str());
+                return filePath;
             }
             i = i + len; //skip over the read characters. 
         }
     }
-    printf("message read done.\n");
+    return "";
 }
 
 void GraphicsClient::drawGUI() {
-    
+    printf("drawing GUI\n");
+    //green rectangle.
+    this->setDrawingColor(0,200,20);
+    this->fillRectangle(game_w,0,gui_w,game_h);
+    //smaller black rectangle.
+    this->setDrawingColor(0,0,0);
+    this->fillRectangle(game_w+padding,padding,gui_w-(padding*2),game_h-(padding*2)); 
+    //draw buttons.
+    this->drawButton(all_btn_x, step_btn_y, btn_w, btn_h, "STEP");
+    this->drawButton(all_btn_x, run_btn_y, btn_w, btn_h, "RUN");
+    this->drawButton(all_btn_x, pause_btn_y, btn_w, btn_h, "PAUSE");
+    this->drawButton(all_btn_x, reset_btn_y, btn_w, btn_h, "RESET");
+    this->drawButton(all_btn_x, random_btn_y, btn_w, btn_h, "RANDOM");
+    this->drawButton(all_btn_x, clear_btn_y, btn_w, btn_h, "CLEAR");
+    this->drawButton(all_btn_x, load_btn_y, btn_w, btn_h, "LOAD");
+    this->drawButton(all_btn_x, quit_btn_y, btn_w, btn_h, "QUIT");
+    this->drawButton(all_btn_x, size1_btn_y, btn_w, btn_h, "SIZE 1");
+    this->drawButton(all_btn_x, size2_btn_y, btn_w, btn_h, "SIZE 2");
+    this->drawButton(all_btn_x, size3_btn_y, btn_w, btn_h, "SIZE 3");
+    this->drawButton(all_btn_x, repaint_btn_y, btn_w, btn_h, "REPAINT");
+}
+
+void GraphicsClient::drawButton(int x, int y, int w, int h, string name) {
+    //green rectangle.
+    this->setDrawingColor(0,200,20);
+    this->fillRectangle(x,y,w,h);
+    //smaller black rectangle.
+    this->setDrawingColor(0,0,0);
+    this->fillRectangle(x+padding,y+padding,w-(padding*2),h-(padding*2)); 
+    //green text.
+    this->setDrawingColor(0,200,20);
+    this->drawstring((x+10),(y+20), name);
 }
 
 void GraphicsClient::requestFile() {
@@ -85,6 +202,9 @@ void GraphicsClient::requestFile() {
  * Parameter: port - The port the GraphicsClient should connect to.
  */
 GraphicsClient::GraphicsClient(string URL, int port) {
+    this->shouldExit = 0;
+    this->shouldReset = 0;
+    this->shouldRefresh = 0;
     this->URL = URL;
     this->port = port;
     this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -107,6 +227,9 @@ GraphicsClient::GraphicsClient(string URL, int port) {
  * Parameter: originalGC - The GraphicsClient object to base the newly created one off of.
  */
 GraphicsClient::GraphicsClient(const GraphicsClient& originalGC) {
+    this->shouldExit = originalGC.shouldExit;
+    this->shouldReset = originalGC.shouldReset;
+    this->shouldRefresh = originalGC.shouldRefresh;
     this->URL = originalGC.URL;
     this->port = originalGC.port;
     this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -139,6 +262,9 @@ GraphicsClient& GraphicsClient::operator=(const GraphicsClient& toCopyGC) {
     if (this != &toCopyGC) {
         close(this->sockfd); //close existing connection
         //Creates new connection with the parameters from RHS (toCopyGC).
+        this->shouldExit = toCopyGC.shouldExit;
+        this->shouldReset = toCopyGC.shouldReset;
+        this->shouldRefresh = toCopyGC.shouldRefresh;
         this->URL = toCopyGC.URL;
         this->port = toCopyGC.port;
         this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
