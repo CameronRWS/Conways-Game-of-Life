@@ -2,7 +2,11 @@
 #include "CellularAutomaton.h"
 #include <string>
 #include <iostream>
+#include <chrono>
+#include <sys/time.h>
+#include <ctime>
 using namespace std;
+using namespace chrono;
 
 /** 
  * Description: Calculates the next state of the indexed cell given the current state of the indexed cell
@@ -27,18 +31,25 @@ int main(int argc, char **argv) {
     CellularAutomaton ca = CellularAutomaton(fileName, 0);
     int shouldExit = 0; //Will store if the while loop should exit or not. Done for readability.
     char input; //Stores the char the user enters into the console.
+    int shouldUpdateScreen = 1;
+    milliseconds lastUpdate = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+    milliseconds currentTime;
+    gc.requestFile();
     while(!shouldExit) { //While the loop shouldn't exit.
-        fflush(stdin); //clean out the input.
-        gc.clear(); //wipe the screen to the background color.
-        ca.displayCA(&gc); //Display the current state of the CA.
-        //ca.displayCAToConsole(); debugging purposes
-        gc.repaint(); //Update the display.
-        input = getchar(); //Get the next char in the console.
-        if(input == '\n') { //If the char put in the console is the return char, simulate the CA once.
-            ca.step2DCA(&ruleGameOfLife);
-        } else { //If the user enters any other char, then the program exits.
-            shouldExit = 1; //Allows for the loop to exit, in a nice readable way.
+        //
+        currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+        //printf("%lld\n", currentTime.count() - lastUpdate.count());
+        gc.getMessage();
+        if(currentTime.count() - lastUpdate.count() > 100) {
+            if(shouldUpdateScreen) {
+                gc.clear(); //wipe the screen to the background color.
+                ca.displayCA(&gc); //Display the current state of the CA.
+                gc.repaint(); //Update the display.
+                ca.step2DCA(&ruleGameOfLife);
+            }
+            lastUpdate = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
         }
+
     }
     printf("Program has exited!\n");
     return 0;

@@ -146,6 +146,9 @@ class GraphicsClient {
          * Parameter: h - The height (in pixels) of the shape to draw.
          */
         void drawShapeHelper(int c, int x, int y, int w, int h);
+        void drawGUI();
+        void getMessage();
+        void requestFile();
     private:
         //Member/Field: string URL - The URL to the GraphicsClient connects to.
         string URL;
