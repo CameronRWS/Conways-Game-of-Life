@@ -95,6 +95,8 @@ class CellularAutomaton {
 
         void stepAndDisplayCA(GraphicsClient* gc);
         void randomize();
+        void checkForCAClick(int x, int y, GraphicsClient* gc);
+        void setSizeAndGap();
     private:
         //Member/Field: int quiescentState - The quiescent (default) state of the CA.
         int quiescentState;
@@ -106,6 +108,8 @@ class CellularAutomaton {
         unsigned char *cadata;
         //Member/Field: unsigned char wrap - Stores if the CA should wrap or not.
         unsigned char wrap;
+        int size; //size of the ca cell pixel to display.
+        int gap; //how big the gap in ca cells.
 };
 
 #endif

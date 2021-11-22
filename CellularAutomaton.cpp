@@ -47,38 +47,58 @@ void CellularAutomaton::displayCAToConsole() {
     printf("\n");
 }
 
+void CellularAutomaton::checkForCAClick(int x, int y, GraphicsClient* gc) {
+    int displayedCAwidth = this->width*this->size + (this->width-1)*this->gap;
+    int displayedCAheight = this->height*this->size + (this->height-1)*this->gap;
+    if(x < displayedCAwidth && y < displayedCAheight) { //if the CA was clicked.
+        if((x % (this->size+this->gap)) <= this->size && (y % (this->size+this->gap)) <= this->size) { //if a gap wasn't clicked.
+            int ca_x = floor(x/(size+gap)); //x coord in the ca.
+            int ca_y = floor(y/(size+gap)); //y coord in the ca.
+            int index = (ca_y*width + ca_x); //index in the ca.
+            if(this->cadata[index] == 1) {
+                this->set2DCACell(ca_x, ca_y, 0);
+                this->displayCA(gc);
+            } else {
+                this->set2DCACell(ca_x, ca_y, 1);
+                this->displayCA(gc);
+            }
+        }
+    }
+}
+
+void CellularAutomaton::setSizeAndGap() {
+    int m = this->width > this->height ? this->width : this->height; //m per assignment specs.
+    //The following thresholds were given in assignment specs.
+    if(m > 1 && m <= 50) {
+        this->size = 10;
+        this->gap = 2;
+    } else if (m > 50 && m <= 100) {
+        this->size = 4;
+        this->gap = 1;
+    } else if (m > 100 && m <= 200) {
+        this->size = 2;
+        this->gap = 1;
+    } else if (m > 200 && m <= 600) {
+        this->size = 1;
+        this->gap = 0;
+    } else {
+        printf("Error: Unsupported value for m.");
+    }
+}
+
 /**
  * Description: Displays the state of the CA to the passed in GraphicsClient.
  * Parameter: gc - A pointer to a GraphicsClient object that the CA needs displayed to.
  */
 void CellularAutomaton::displayCA(GraphicsClient* gc) {
+    printf("displaying ca\n");
     gc->clearGame();
     int maxIndex = this->width * this->height; 
-    int m = this->width > this->height ? this->width : this->height; //m per the assignment spec.
     for(int i = 0; i < maxIndex; i++) { //For all cells within the CA.
         int x = i % width; //get the x coord.
         int y = floor(i/width); //get the y coord.
-        //The following logic was given in the assignment spec for displaying CAs.
         if(this->cadata[i] == 1) {
-            if(m > 1 && m <= 50) {
-                int size = 10;
-                int gap = 2;
-                gc->fillRectangle(x*(size+gap), y*(size+gap), size, size);
-            } else if (m > 50 && m <= 100) {
-                int size = 4;
-                int gap = 1;
-                gc->fillRectangle(x*(size+gap), y*(size+gap), size, size);
-            } else if (m > 100 && m <= 200) {
-                int size = 2;
-                int gap = 1;
-                gc->fillRectangle(x*(size+gap), y*(size+gap), size, size);
-            } else if (m > 200 && m <= 600) {
-                int size = 1;
-                int gap = 0;
-                gc->fillRectangle(x, y, 1, 1);
-            } else {
-                printf("Error: Unsupported value for m.");
-            }
+            gc->fillRectangle(x*(this->size+this->gap), y*(this->size+this->gap), this->size, this->size);
         }
     }
     gc->repaint();
@@ -134,6 +154,7 @@ CellularAutomaton::CellularAutomaton(int width, int height, unsigned char quiesc
     this->quiescentState = quiescentState; //Set ca's quiescent state to the passed in quiescent state.
     this->width = width; //Set ca's width to the given width.
     this->height = height; //Set ca's height to the given height.
+    this->setSizeAndGap(); //Calculate and set the size and gap for displaying the CA with GC.
     this->wrap = shouldWrapFlag; //Set ca's should wrap flag for access later.
     this->cadata = new unsigned char[width * height]; //Allocate memory on the heap for the cells array.
     if(this->cadata == NULL) {
@@ -158,6 +179,7 @@ CellularAutomaton::CellularAutomaton(string fileName, int quiescentState) {
     fscanf(file, "%d", &cols); //Scans the second int in the file and stores as the number of cols.
     this->height = rows;
     this->width = cols;
+    this->setSizeAndGap(); //Calculate and set the size and gap for displaying the CA with GC.
     this->quiescentState = quiescentState;
     this->wrap = 1;
     this->cadata = new unsigned char[width * height]; //Allocate memory on the heap for the cells array.
@@ -196,6 +218,8 @@ CellularAutomaton::CellularAutomaton(const CellularAutomaton& originalCA) {
     } //Check to make sure the memory was allocated on the heap.
     this->height = originalCA.height;
     this->width = originalCA.width;
+    this->size = originalCA.size;
+    this->gap = originalCA.gap;
     this->wrap = originalCA.wrap;
     this->quiescentState = originalCA.quiescentState;
     //The following for loop copies the actual 2DCA's cells into the temporary 2DCA.
@@ -227,6 +251,8 @@ CellularAutomaton& CellularAutomaton::operator=(const CellularAutomaton& toCopyC
         } //Check to make sure the memory was allocated on the heap.
         this->height = toCopyCA.height;
         this->width = toCopyCA.width;
+        this->size = toCopyCA.size;
+        this->gap = toCopyCA.gap;
         this->wrap = toCopyCA.wrap;
         this->quiescentState = toCopyCA.quiescentState;
         //The following for loop copies the actual 2DCA's cells into the temporary 2DCA.

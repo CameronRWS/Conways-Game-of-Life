@@ -70,7 +70,8 @@ void GraphicsClient::clearGame() {
 
 string GraphicsClient::clickEvent(int x, int y, CellularAutomaton* ca) {
     printf("click at: (%d, %d)", x, y);
-    if(x > all_btn_x && x < all_btn_x + btn_w) {
+    if(x > all_btn_x && x < all_btn_x + btn_w) { //if click was within button area.
+        printf("hiii\n");
         if(y > step_btn_y && y < step_btn_y + btn_h) {
             ca->stepAndDisplayCA(this);
             this->setShouldRefresh(0); //stop auto simulate.
@@ -98,7 +99,9 @@ string GraphicsClient::clickEvent(int x, int y, CellularAutomaton* ca) {
             return "./predefinedCAs/600by600.txt";
         } else if(y > repaint_btn_y && y < repaint_btn_y + btn_h) {
             this->repaint();
-        }  
+        }
+    } else { //Click wasn't in the button area.
+        ca->checkForCAClick(x, y, this);
     }
     return "";
 }
