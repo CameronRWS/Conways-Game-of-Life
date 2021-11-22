@@ -31,37 +31,20 @@ void CellularAutomaton::initCA() {
     }
 }
 
-/**
- * Description: Displays the state of the CA to the console (like in project 1 part c). This
- *  method is used for debugging.
- */
-void CellularAutomaton::displayCAToConsole() {
-    int maxIndex = this->width * this->height; 
-    for(int i = 0; i < maxIndex; i++) { //For all cells within the CA.
-        if(i % (this->width) == 0 && i != 0) { //If i is at the end of a row, create a new line.
-            printf("\n%d ", this->cadata[i]); //Print the return char then the char with a space after it.
-        } else {
-            printf("%d ", this->cadata[i]); //Print the char with a space after it.
-        }
-    }
-    printf("\n");
-}
-
 void CellularAutomaton::checkForCAClick(int x, int y, GraphicsClient* gc) {
     int displayedCAwidth = this->width*this->size + (this->width-1)*this->gap;
     int displayedCAheight = this->height*this->size + (this->height-1)*this->gap;
     if(x < displayedCAwidth && y < displayedCAheight) { //if the CA was clicked.
-        if((x % (this->size+this->gap)) <= this->size && (y % (this->size+this->gap)) <= this->size) { //if a gap wasn't clicked.
-            int ca_x = floor(x/(size+gap)); //x coord in the ca.
-            int ca_y = floor(y/(size+gap)); //y coord in the ca.
-            int index = (ca_y*width + ca_x); //index in the ca.
-            if(this->cadata[index] == 1) {
-                this->set2DCACell(ca_x, ca_y, 0);
-                this->displayCA(gc);
-            } else {
-                this->set2DCACell(ca_x, ca_y, 1);
-                this->displayCA(gc);
-            }
+        //I could have checked if they clicked a gap or not, but with the supported CA sizes this made the smaller CA sizes harder to toggle cells.
+        int ca_x = floor(x/(size+gap)); //x coord in the ca.
+        int ca_y = floor(y/(size+gap)); //y coord in the ca.
+        int index = (ca_y*width + ca_x); //index in the ca.
+        if(this->cadata[index] == 1) {
+            this->set2DCACell(ca_x, ca_y, 0);
+            this->displayCA(gc);
+        } else {
+            this->set2DCACell(ca_x, ca_y, 1);
+            this->displayCA(gc);
         }
     }
 }

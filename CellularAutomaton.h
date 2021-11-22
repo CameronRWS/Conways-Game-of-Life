@@ -48,11 +48,6 @@ class CellularAutomaton {
          * Description: Displays the state of the CA to the console (like in project 1 part c). This
          *  method is used for debugging.
          */
-        void displayCAToConsole();
-        /**
-         * Description: Displays the state of the CA to the passed in GraphicsClient.
-         * Parameter: gc - A pointer to a GraphicsClient object that the CA needs displayed to.
-         */
         void displayCA(GraphicsClient* gc);
         /**
          * Description: Sets the value of a cell in the CA.
