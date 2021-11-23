@@ -10,11 +10,11 @@ using namespace std;
 #ifndef GC_HEADER
 #define GC_HEADER
 #include "CellularAutomaton.h" //Allows for 2DCA usage.
+class CellularAutomaton;
 /**
  * Description: Convenient class for communicating with a graphics server via various drawing methods. 
  *  This class encapsulates what a window created by the graphics server is.
  */
-class CellularAutomaton;
 class GraphicsClient {
     public:
         /**
@@ -154,8 +154,6 @@ class GraphicsClient {
         void drawButton(int x, int y, int w, int h, string name);
         int getShouldRefresh();
         int getShouldExit();
-        void setShouldRefresh(int shouldRefresh);
-        void setShouldExit(int shouldExit);
         void clearGame();
         void connectToAddress(string URL, int port);
     private:

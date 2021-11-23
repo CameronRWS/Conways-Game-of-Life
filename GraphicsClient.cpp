@@ -54,30 +54,37 @@ void GraphicsClient::clickEvent(int x, int y, CellularAutomaton* ca) {
             ca->stepAndDisplayCA(this);
             this->shouldRefresh = 0; //stop auto simulate.
         } else if(y > run_btn_y && y < run_btn_y + btn_h) {
-            this->shouldRefresh = 1;
+            this->shouldRefresh = 1; //enable auto simulate.
         } else if(y > pause_btn_y && y < pause_btn_y + btn_h) {
             this->shouldRefresh = 0;
         } else if(y > reset_btn_y && y < reset_btn_y + btn_h) {
             ca->loadCAfromFile(ca->getFileName(), ca->getQuiescentState());
+            this->shouldRefresh = 0; //stop auto simulate.
             ca->displayCA(this);
         } else if(y > random_btn_y && y < random_btn_y + btn_h) {
             ca->randomize();
+            this->shouldRefresh = 0; //stop auto simulate.
             ca->displayCA(this);
         } else if(y > clear_btn_y && y < clear_btn_y + btn_h) {
             ca->initCA();
+            this->shouldRefresh = 0; //stop auto simulate.
             ca->displayCA(this);
         } else if(y > load_btn_y && y < load_btn_y + btn_h) {
+            this->shouldRefresh = 0; //stop auto simulate.
             this->requestFile();
         } else if(y > quit_btn_y && y < quit_btn_y + btn_h) {
             this->shouldExit = 1;
         } else if(y > size1_btn_y && y < size1_btn_y + btn_h) {
             ca->loadCAfromFile("./predefinedCAs/40by40.txt", ca->getQuiescentState());
+            this->shouldRefresh = 0; //stop auto simulate.
             ca->displayCA(this);
         } else if(y > size2_btn_y && y < size2_btn_y + btn_h) {
             ca->loadCAfromFile("./predefinedCAs/150by150.txt", ca->getQuiescentState());
+            this->shouldRefresh = 0; //stop auto simulate.
             ca->displayCA(this);
         } else if(y > size3_btn_y && y < size3_btn_y + btn_h) {
             ca->loadCAfromFile("./predefinedCAs/600by600.txt", ca->getQuiescentState());
+            this->shouldRefresh = 0; //stop auto simulate.
             ca->displayCA(this);
         } else if(y > repaint_btn_y && y < repaint_btn_y + btn_h) {
             this->repaint();
@@ -95,24 +102,13 @@ void GraphicsClient::checkForMessages(CellularAutomaton* ca) {
     read(this->sockfd, message, count);
     for(int i = 0; i < count; i++) {
         if(message[i] == -1) { //start of message
-            int len1 = message[i+1] << 12;//<< 12 //*4096
-            int len2 = message[i+2] << 8;// << 8 //* 256
-            int len3 = message[i+3] << 4; //<< 4 //* 16
-            int len4 = message[i+4];
-            int len = len1 + len2 + len3 + len4;
+            int len = (message[i+1] << 12) + (message[i+2] << 8) + (message[i+3] << 4) + message[i+4];
             printf("len: %d\n", len);
             if(message[i+5] == 0x03) { //click
                 printf("click!\n");
-                int x1 = message[i+7] << 12;
-                int x2 = message[i+8] << 8;
-                int x3 = message[i+9] << 4;
-                int x4 = message[i+10];
-                int y1 = message[i+11] << 12;
-                int y2 = message[i+12] << 8;
-                int y3 = message[i+13] << 4;
-                int y4 = message[i+14];
-                int x = x1 + x2 + x3 + x4;
-                int y = y1 + y2 + y3 + y4;
+                //The following lines of code read the next 8 nibbles and gets x and y values.
+                int x = (message[i+7] << 12) + (message[i+8] << 8) + (message[i+9] << 4) + (message[i+10]);
+                int y = (message[i+11] << 12) + (message[i+12] << 8) + (message[i+13] << 4) + (message[i+14]);
                 this->clickEvent(x, y, ca);
             } else if(message[i+5] == 0x0A) { //file
                 printf("file!\n");
