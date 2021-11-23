@@ -139,6 +139,7 @@ CellularAutomaton::CellularAutomaton(int width, int height, unsigned char quiesc
     this->height = height; //Set ca's height to the given height.
     this->setSizeAndGap(); //Calculate and set the size and gap for displaying the CA with GC.
     this->wrap = shouldWrapFlag; //Set ca's should wrap flag for access later.
+    this->cadata = NULL;
     this->cadata = new unsigned char[width * height]; //Allocate memory on the heap for the cells array.
     if(this->cadata == NULL) {
         printf("Error with allocating memory for CA array.\n");
@@ -152,6 +153,13 @@ CellularAutomaton::CellularAutomaton(int width, int height, unsigned char quiesc
  * Parameter: quiescentState - The quiescent state (default state) of the new CA to create.
  */
 CellularAutomaton::CellularAutomaton(string fileName, int quiescentState) {
+    this->loadCAfromFile(fileName, quiescentState);
+}
+
+void CellularAutomaton::loadCAfromFile(string fileName, int quiescentState) {
+    if(this->cadata != NULL) {
+        delete this->cadata;
+    }
     FILE *file; //Stores the file to be read.
     file = fopen(fileName.c_str(), "r"); //Reads the file passed in.
     if(!file) { //If the file is NULL then it wasn't read in properly.
@@ -165,6 +173,8 @@ CellularAutomaton::CellularAutomaton(string fileName, int quiescentState) {
     this->setSizeAndGap(); //Calculate and set the size and gap for displaying the CA with GC.
     this->quiescentState = quiescentState;
     this->wrap = 1;
+    this->fileName = fileName;
+    this->cadata = NULL;
     this->cadata = new unsigned char[width * height]; //Allocate memory on the heap for the cells array.
     if(this->cadata == NULL) {
         printf("Error with allocating memory for CA array.\n");
@@ -195,21 +205,26 @@ CellularAutomaton::CellularAutomaton(string fileName, int quiescentState) {
  * Parameter: originalCA - The CA to create this new CA from.
  */
 CellularAutomaton::CellularAutomaton(const CellularAutomaton& originalCA) {
-    this->cadata = new unsigned char[originalCA.width * originalCA.height];
+    this->deepCopy(originalCA);
+}
+
+void CellularAutomaton::deepCopy(const CellularAutomaton& toCopyCA) {
+    this->cadata = NULL;
+    this->cadata = new unsigned char[toCopyCA.width * toCopyCA.height];
     if(this->cadata == NULL) {
         printf("Error with allocating memory for CA array.\n");
     } //Check to make sure the memory was allocated on the heap.
-    this->height = originalCA.height;
-    this->width = originalCA.width;
-    this->size = originalCA.size;
-    this->gap = originalCA.gap;
-    this->wrap = originalCA.wrap;
-    this->quiescentState = originalCA.quiescentState;
+    this->height = toCopyCA.height;
+    this->width = toCopyCA.width;
+    this->size = toCopyCA.size;
+    this->gap = toCopyCA.gap;
+    this->wrap = toCopyCA.wrap;
+    this->quiescentState = toCopyCA.quiescentState;
     //The following for loop copies the actual 2DCA's cells into the temporary 2DCA.
     for(int x = 0; x < this->width; x++) {
         for(int y = 0; y < this->height; y++) {
             int index = x+(y*this->width); //Converts the coords to an index.
-            this->cadata[index] = originalCA.cadata[index]; //Copies actual value into temp.
+            this->cadata[index] = toCopyCA.cadata[index]; //Copies actual value into temp.
         }
     }
 }
@@ -228,23 +243,7 @@ CellularAutomaton::~CellularAutomaton() {
 CellularAutomaton& CellularAutomaton::operator=(const CellularAutomaton& toCopyCA) {
     if (this != &toCopyCA) {
         delete this->cadata;
-        this->cadata = new unsigned char[toCopyCA.width * toCopyCA.height];
-        if(this->cadata == NULL) {
-            printf("Error with allocating memory for CA array.\n");
-        } //Check to make sure the memory was allocated on the heap.
-        this->height = toCopyCA.height;
-        this->width = toCopyCA.width;
-        this->size = toCopyCA.size;
-        this->gap = toCopyCA.gap;
-        this->wrap = toCopyCA.wrap;
-        this->quiescentState = toCopyCA.quiescentState;
-        //The following for loop copies the actual 2DCA's cells into the temporary 2DCA.
-        for(int x = 0; x < this->width; x++) {
-            for(int y = 0; y < this->height; y++) {
-                int index = x+(y*this->width); //Converts the coords to an index.
-                this->cadata[index] = toCopyCA.cadata[index]; //Copies actual value into temp.
-            }
-        }
+        this->deepCopy(toCopyCA);
     }
     return *this;
 }
@@ -287,6 +286,10 @@ unsigned char* CellularAutomaton::getCAdata() {
  */
 unsigned char CellularAutomaton::getWrap() {
     return this->wrap;
+}
+
+string CellularAutomaton::getFileName() {
+    return this->fileName;
 }
 
 /** 

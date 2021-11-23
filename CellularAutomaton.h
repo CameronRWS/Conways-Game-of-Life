@@ -88,10 +88,14 @@ class CellularAutomaton {
          */
         unsigned char getWrap();
 
+        string getFileName();
+
         void stepAndDisplayCA(GraphicsClient* gc);
         void randomize();
         void checkForCAClick(int x, int y, GraphicsClient* gc);
         void setSizeAndGap();
+        void deepCopy(const CellularAutomaton& toCopyCA);
+        void loadCAfromFile(string fileName, int quiescentState);
     private:
         //Member/Field: int quiescentState - The quiescent (default) state of the CA.
         int quiescentState;
@@ -105,6 +109,7 @@ class CellularAutomaton {
         unsigned char wrap;
         int size; //size of the ca cell pixel to display.
         int gap; //how big the gap in ca cells.
+        string fileName;
 };
 
 #endif

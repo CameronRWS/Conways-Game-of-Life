@@ -10,8 +10,6 @@
 #include <math.h> //For use of floor.
 #include "GraphicsClient.h" //Graphics client header.
 
-
-
 const int padding = 4; //padding for GUI.
 const int gui_w = 200;
 const int game_w = 600;
@@ -33,33 +31,14 @@ const int size2_btn_y  = 10+(btn_gap*9);
 const int size3_btn_y  = 10+(btn_gap*10);
 const int repaint_btn_y = 10+(btn_gap*11);
 
-
-
 using namespace std;
-
-
-int GraphicsClient::getShouldReset() {
-    return this->shouldReset;
-}
-
-void GraphicsClient::setShouldReset(int shouldReset) {
-    this->shouldReset = shouldReset;
-}
 
 int GraphicsClient::getShouldRefresh() {
     return this->shouldRefresh;
 }
 
-void GraphicsClient::setShouldRefresh(int shouldRefresh) {
-    this->shouldRefresh = shouldRefresh;
-}
-
 int GraphicsClient::getShouldExit() {
     return this->shouldExit;
-}
-
-void GraphicsClient::setShouldExit(int shouldExit) {
-    this->shouldExit= shouldExit;
 }
 
 void GraphicsClient::clearGame() {
@@ -68,19 +47,19 @@ void GraphicsClient::clearGame() {
     this->setDrawingColor(0,200,20); //go back to green.
 }
 
-string GraphicsClient::clickEvent(int x, int y, CellularAutomaton* ca) {
+void GraphicsClient::clickEvent(int x, int y, CellularAutomaton* ca) {
     printf("click at: (%d, %d)", x, y);
     if(x > all_btn_x && x < all_btn_x + btn_w) { //if click was within button area.
-        printf("hiii\n");
         if(y > step_btn_y && y < step_btn_y + btn_h) {
             ca->stepAndDisplayCA(this);
-            this->setShouldRefresh(0); //stop auto simulate.
+            this->shouldRefresh = 0; //stop auto simulate.
         } else if(y > run_btn_y && y < run_btn_y + btn_h) {
             this->shouldRefresh = 1;
         } else if(y > pause_btn_y && y < pause_btn_y + btn_h) {
             this->shouldRefresh = 0;
         } else if(y > reset_btn_y && y < reset_btn_y + btn_h) {
-            this->shouldReset = 1;
+            ca->loadCAfromFile(ca->getFileName(), ca->getQuiescentState());
+            ca->displayCA(this);
         } else if(y > random_btn_y && y < random_btn_y + btn_h) {
             ca->randomize();
             ca->displayCA(this);
@@ -92,28 +71,30 @@ string GraphicsClient::clickEvent(int x, int y, CellularAutomaton* ca) {
         } else if(y > quit_btn_y && y < quit_btn_y + btn_h) {
             this->shouldExit = 1;
         } else if(y > size1_btn_y && y < size1_btn_y + btn_h) {
-            return "./predefinedCAs/40by40.txt";
+            ca->loadCAfromFile("./predefinedCAs/40by40.txt", ca->getQuiescentState());
+            ca->displayCA(this);
         } else if(y > size2_btn_y && y < size2_btn_y + btn_h) {
-            return "./predefinedCAs/150by150.txt";
+            ca->loadCAfromFile("./predefinedCAs/150by150.txt", ca->getQuiescentState());
+            ca->displayCA(this);
         } else if(y > size3_btn_y && y < size3_btn_y + btn_h) {
-            return "./predefinedCAs/600by600.txt";
+            ca->loadCAfromFile("./predefinedCAs/600by600.txt", ca->getQuiescentState());
+            ca->displayCA(this);
         } else if(y > repaint_btn_y && y < repaint_btn_y + btn_h) {
             this->repaint();
         }
     } else { //Click wasn't in the button area.
         ca->checkForCAClick(x, y, this);
     }
-    return "";
 }
 
-string GraphicsClient::getMessage(CellularAutomaton* ca) {
+void GraphicsClient::checkForMessages(CellularAutomaton* ca) {
     int count; //number of bytes that can be read.
     ioctl(this->sockfd, FIONREAD, &count); 
-    if(count == 0) { return ""; }
+    if(count == 0) { return; }
     char message[count];
     read(this->sockfd, message, count);
     for(int i = 0; i < count; i++) {
-        if(message[i] == -1) {
+        if(message[i] == -1) { //start of message
             int len1 = message[i+1] << 12;//<< 12 //*4096
             int len2 = message[i+2] << 8;// << 8 //* 256
             int len3 = message[i+3] << 4; //<< 4 //* 16
@@ -132,7 +113,7 @@ string GraphicsClient::getMessage(CellularAutomaton* ca) {
                 int y4 = message[i+14];
                 int x = x1 + x2 + x3 + x4;
                 int y = y1 + y2 + y3 + y4;
-                return this->clickEvent(x, y, ca);
+                this->clickEvent(x, y, ca);
             } else if(message[i+5] == 0x0A) { //file
                 printf("file!\n");
                 int filePathLen = (len-1)/2; //-1 to remove the file command and /2 since each char takes up 2 nibbles.
@@ -143,14 +124,12 @@ string GraphicsClient::getMessage(CellularAutomaton* ca) {
                     int chr = chr1 + chr2;
                     filePath = filePath + (char)chr;
                 }
-                printf("\n");
-                printf("string: '%s'\n", filePath.c_str());
-                return filePath;
+                ca->loadCAfromFile(filePath, ca->getQuiescentState());
+                ca->displayCA(this);
             }
             i = i + len; //skip over the read characters. 
         }
     }
-    return "";
 }
 
 void GraphicsClient::drawGUI() {
@@ -206,10 +185,13 @@ void GraphicsClient::requestFile() {
  */
 GraphicsClient::GraphicsClient(string URL, int port) {
     this->shouldExit = 0;
-    this->shouldReset = 0;
     this->shouldRefresh = 0;
     this->URL = URL;
     this->port = port;
+    this->connectToAddress(URL, port);
+}
+
+void GraphicsClient::connectToAddress(string URL, int port) {
     this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         fprintf(stderr, "Error creating socket \n");
@@ -231,30 +213,17 @@ GraphicsClient::GraphicsClient(string URL, int port) {
  */
 GraphicsClient::GraphicsClient(const GraphicsClient& originalGC) {
     this->shouldExit = originalGC.shouldExit;
-    this->shouldReset = originalGC.shouldReset;
     this->shouldRefresh = originalGC.shouldRefresh;
     this->URL = originalGC.URL;
     this->port = originalGC.port;
-    this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
-        fprintf(stderr, "Error creating socket \n");
-    }
-    memset(&this->serv_addr, '0', sizeof(this->serv_addr));
-    this->serv_addr.sin_family = AF_INET;
-    this->serv_addr.sin_port = htons(this->port);
-    if(inet_pton(AF_INET, URL.c_str(), &this->serv_addr.sin_addr) <= 0) {
-        fprintf(stderr, "Invalid address/ Address not supported \n");
-    }
-    if (connect(this->sockfd, (struct sockaddr *)&this->serv_addr, sizeof(this->serv_addr)) < 0) {
-        fprintf(stderr, "Connection Failed \n");
-    }
+    this->connectToAddress(URL, port);
 }
 
 /**
  * Description: A destructor for a GraphicsClient object.
  */
 GraphicsClient::~GraphicsClient() {
-    close(sockfd);
+    close(this->sockfd);
 }
 
 /**
@@ -263,26 +232,12 @@ GraphicsClient::~GraphicsClient() {
  */
 GraphicsClient& GraphicsClient::operator=(const GraphicsClient& toCopyGC) {
     if (this != &toCopyGC) {
-        close(this->sockfd); //close existing connection
-        //Creates new connection with the parameters from RHS (toCopyGC).
+        close(this->sockfd);
         this->shouldExit = toCopyGC.shouldExit;
-        this->shouldReset = toCopyGC.shouldReset;
         this->shouldRefresh = toCopyGC.shouldRefresh;
         this->URL = toCopyGC.URL;
         this->port = toCopyGC.port;
-        this->sockfd = socket(AF_INET, SOCK_STREAM, 0);
-        if (sockfd < 0) {
-            fprintf(stderr, "Error creating socket \n");
-        }
-        memset(&this->serv_addr, '0', sizeof(this->serv_addr));
-        this->serv_addr.sin_family = AF_INET;
-        this->serv_addr.sin_port = htons(this->port);
-        if(inet_pton(AF_INET, URL.c_str(), &this->serv_addr.sin_addr) <= 0) {
-            fprintf(stderr, "Invalid address/ Address not supported \n");
-        }
-        if (connect(this->sockfd, (struct sockaddr *)&this->serv_addr, sizeof(this->serv_addr)) < 0) {
-            fprintf(stderr, "Connection Failed \n");
-        }
+        this->connectToAddress(URL, port);
     }
     return *this;
 }

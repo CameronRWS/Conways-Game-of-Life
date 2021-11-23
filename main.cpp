@@ -5,7 +5,6 @@
 #include <sys/time.h>
 #include <ctime>
 using namespace std;
-using namespace chrono;
 
 int main(int argc, char **argv) {
     //Checks to make sure the user entered in the correct number of arguments.
@@ -19,36 +18,17 @@ int main(int argc, char **argv) {
     CellularAutomaton ca = CellularAutomaton(fileName, 0);
     int shouldExit = 0; //Will store if the while loop should exit or not. Done for readability.
     char input; //Stores the char the user enters into the console.
-    int shouldUpdateScreen = 1;
-    milliseconds lastUpdate = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-    milliseconds currentTime;
-    //gc.requestFile();
     gc.drawGUI();
     ca.displayCA(&gc);
     while(!shouldExit) { //While the loop shouldn't exit.
-        currentTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-        string newFileName = gc.getMessage(&ca);
-        if(newFileName != "") {
-            fileName = newFileName;
-            gc.setShouldReset(1);
-            printf("%s\n", fileName.c_str());
+        gc.checkForMessages(&ca);
+        if(gc.getShouldRefresh()) {
+            ca.stepAndDisplayCA(&gc);
         }
-        if(currentTime.count() - lastUpdate.count() > 500) {
-            if(gc.getShouldRefresh()) {
-                ca.stepAndDisplayCA(&gc);
-            }
-            if(gc.getShouldReset()) {
-                ca = CellularAutomaton(fileName, 0);
-                gc.clearGame();
-                ca.displayCA(&gc);
-                gc.setShouldReset(0);
-                gc.setShouldRefresh(0);
-            }
-            if(gc.getShouldExit()) {
-                shouldExit = 1;
-            }
-            lastUpdate = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+        if(gc.getShouldExit()) {
+            shouldExit = 1;
         }
+        nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
     }
     printf("Program has exited!\n");
     return 0;
