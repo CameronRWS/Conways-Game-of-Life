@@ -6,10 +6,10 @@ using namespace std;
 #ifndef CA_HEADER
 #define CA_HEADER
 #include "GraphicsClient.h" //Graphics client header.
+class GraphicsClient;
 /** 
  * Description: Stores a CA in a convenient class with various methods to modify the CA.
  */
-class GraphicsClient;
 class CellularAutomaton {
     public:
         /**
@@ -87,9 +87,7 @@ class CellularAutomaton {
          * Returns: unsigned char - The wrap flag of the CA.
          */
         unsigned char getWrap();
-
         string getFileName();
-
         void stepAndDisplayCA(GraphicsClient* gc);
         void randomize();
         void checkForCAClick(int x, int y, GraphicsClient* gc);
@@ -109,7 +107,7 @@ class CellularAutomaton {
         unsigned char wrap;
         int size; //size of the ca cell pixel to display.
         int gap; //how big the gap in ca cells.
-        string fileName;
+        string fileName; //The last file used to load a CA.
 };
 
 #endif
