@@ -1,4 +1,4 @@
-# COMS 327 - Project 2 Part A
+# COMS 327 - Project 2 Part B
 This part of the project is an implementation of Conway's Game of Life displayed on a graphics window.
 
 ## Features Implemented
