@@ -29,7 +29,6 @@ const int quit_btn_y   = 10+(btn_gap*7);
 const int size1_btn_y  = 10+(btn_gap*8);
 const int size2_btn_y  = 10+(btn_gap*9);
 const int size3_btn_y  = 10+(btn_gap*10);
-const int repaint_btn_y = 10+(btn_gap*11);
 
 using namespace std;
 
@@ -48,7 +47,7 @@ void GraphicsClient::clearGame() {
 }
 
 void GraphicsClient::clickEvent(int x, int y, CellularAutomaton* ca) {
-    printf("click at: (%d, %d)", x, y);
+    printf("click at: (%d, %d)\n", x, y);
     if(x > all_btn_x && x < all_btn_x + btn_w) { //if click was within button area.
         if(y > step_btn_y && y < step_btn_y + btn_h) {
             ca->stepAndDisplayCA(this);
@@ -58,7 +57,7 @@ void GraphicsClient::clickEvent(int x, int y, CellularAutomaton* ca) {
         } else if(y > pause_btn_y && y < pause_btn_y + btn_h) {
             this->shouldRefresh = 0;
         } else if(y > reset_btn_y && y < reset_btn_y + btn_h) {
-            ca->loadCAfromFile(ca->getFileName(), ca->getQuiescentState());
+            ca->loadCAfromFile(ca->getFileName(), ca->getQuiescentState(), 0);
             this->shouldRefresh = 0; //stop auto simulate.
             ca->displayCA(this);
         } else if(y > random_btn_y && y < random_btn_y + btn_h) {
@@ -75,19 +74,17 @@ void GraphicsClient::clickEvent(int x, int y, CellularAutomaton* ca) {
         } else if(y > quit_btn_y && y < quit_btn_y + btn_h) {
             this->shouldExit = 1;
         } else if(y > size1_btn_y && y < size1_btn_y + btn_h) {
-            ca->loadCAfromFile("./predefinedCAs/40by40.txt", ca->getQuiescentState());
+            ca->loadCAfromFile("./predefinedCAs/40by40.txt", ca->getQuiescentState(), 0);
             this->shouldRefresh = 0; //stop auto simulate.
             ca->displayCA(this);
         } else if(y > size2_btn_y && y < size2_btn_y + btn_h) {
-            ca->loadCAfromFile("./predefinedCAs/150by150.txt", ca->getQuiescentState());
+            ca->loadCAfromFile("./predefinedCAs/150by150.txt", ca->getQuiescentState(), 0);
             this->shouldRefresh = 0; //stop auto simulate.
             ca->displayCA(this);
         } else if(y > size3_btn_y && y < size3_btn_y + btn_h) {
-            ca->loadCAfromFile("./predefinedCAs/600by600.txt", ca->getQuiescentState());
+            ca->loadCAfromFile("./predefinedCAs/600by600.txt", ca->getQuiescentState(), 0);
             this->shouldRefresh = 0; //stop auto simulate.
             ca->displayCA(this);
-        } else if(y > repaint_btn_y && y < repaint_btn_y + btn_h) {
-            this->repaint();
         }
     } else { //Click wasn't in the button area.
         ca->checkForCAClick(x, y, this);
@@ -100,6 +97,13 @@ void GraphicsClient::checkForMessages(CellularAutomaton* ca) {
     if(count == 0) { return; }
     char message[count];
     read(this->sockfd, message, count);
+    // //debug
+    // printf("received: ");
+    // for(int i = 0; i < count; i++) {
+    //     printf("%d,", message[i]);
+    // }
+    // printf("\n");
+    // //debug^
     for(int i = 0; i < count; i++) {
         if(message[i] == -1) { //start of message
             int len = (message[i+1] << 12) + (message[i+2] << 8) + (message[i+3] << 4) + message[i+4];
@@ -120,7 +124,7 @@ void GraphicsClient::checkForMessages(CellularAutomaton* ca) {
                     int chr = chr1 + chr2;
                     filePath = filePath + (char)chr;
                 }
-                ca->loadCAfromFile(filePath, ca->getQuiescentState());
+                ca->loadCAfromFile(filePath, ca->getQuiescentState(), 1);
                 ca->displayCA(this);
             }
             i = i + len; //skip over the read characters. 
@@ -148,7 +152,6 @@ void GraphicsClient::drawGUI() {
     this->drawButton(all_btn_x, size1_btn_y, btn_w, btn_h, "SIZE 1");
     this->drawButton(all_btn_x, size2_btn_y, btn_w, btn_h, "SIZE 2");
     this->drawButton(all_btn_x, size3_btn_y, btn_w, btn_h, "SIZE 3");
-    this->drawButton(all_btn_x, repaint_btn_y, btn_w, btn_h, "REPAINT");
 }
 
 void GraphicsClient::drawButton(int x, int y, int w, int h, string name) {

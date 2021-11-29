@@ -93,7 +93,7 @@ class CellularAutomaton {
         void checkForCAClick(int x, int y, GraphicsClient* gc);
         void setSizeAndGap();
         void deepCopy(const CellularAutomaton& toCopyCA);
-        void loadCAfromFile(string fileName, int quiescentState);
+        void loadCAfromFile(string fileName, int quiescentState, int shouldSaveFileName);
     private:
         //Member/Field: int quiescentState - The quiescent (default) state of the CA.
         int quiescentState;

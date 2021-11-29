@@ -153,10 +153,10 @@ CellularAutomaton::CellularAutomaton(int width, int height, unsigned char quiesc
  * Parameter: quiescentState - The quiescent state (default state) of the new CA to create.
  */
 CellularAutomaton::CellularAutomaton(string fileName, int quiescentState) {
-    this->loadCAfromFile(fileName, quiescentState);
+    this->loadCAfromFile(fileName, quiescentState, 1);
 }
 
-void CellularAutomaton::loadCAfromFile(string fileName, int quiescentState) {
+void CellularAutomaton::loadCAfromFile(string fileName, int quiescentState, int shouldSaveFileName) {
     if(this->cadata != NULL) {
         delete this->cadata;
     }
@@ -173,7 +173,9 @@ void CellularAutomaton::loadCAfromFile(string fileName, int quiescentState) {
     this->setSizeAndGap(); //Calculate and set the size and gap for displaying the CA with GC.
     this->quiescentState = quiescentState;
     this->wrap = 1;
-    this->fileName = fileName;
+    if(shouldSaveFileName) {
+        this->fileName = fileName;
+    }
     this->cadata = NULL;
     this->cadata = new unsigned char[width * height]; //Allocate memory on the heap for the cells array.
     if(this->cadata == NULL) {
