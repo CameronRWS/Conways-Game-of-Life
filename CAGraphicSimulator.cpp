@@ -131,10 +131,10 @@ void CAGraphicSimulator::checkForCAClick(int x, int y) {
         int index = (ca_y*this->ca->getWidth() + ca_x); //index in the ca.
         if(this->ca->getCAdata()[index] == 1) {
             this->ca->set2DCACell(ca_x, ca_y, 0);
-            this->ca->displayCA(this->gc);
+            this->displayCA();
         } else {
             this->ca->set2DCACell(ca_x, ca_y, 1);
-            this->ca->displayCA(this->gc);
+            this->displayCA();
         }
     }
 }
