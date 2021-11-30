@@ -77,6 +77,8 @@ class CellularAutomaton {
          * Returns: integer - The height of the CA.
          */
         int getHeight();
+        int getSize();
+        int getGap();
         /**
          * Description: A getter for the CA's cell data.
          * Returns: unsigned char* (array) - The CA's cell data (values).
@@ -88,9 +90,7 @@ class CellularAutomaton {
          */
         unsigned char getWrap();
         string getFileName();
-        void stepAndDisplayCA(GraphicsClient* gc);
         void randomize();
-        void checkForCAClick(int x, int y, GraphicsClient* gc);
         void setSizeAndGap();
         void deepCopy(const CellularAutomaton& toCopyCA);
         void loadCAfromFile(string fileName, int quiescentState, int shouldSaveFileName);

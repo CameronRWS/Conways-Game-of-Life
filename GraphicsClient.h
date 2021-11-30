@@ -5,12 +5,13 @@
 #include <unistd.h> //From socket code
 #include <string> //For using strings.
 #include <iostream> //input/output in C++ (not the same as stdio.h).
+#include <list>
+#include "GCMessage.h" //Allows for GCM usage.
+
 using namespace std;
 
 #ifndef GC_HEADER
 #define GC_HEADER
-#include "CellularAutomaton.h" //Allows for 2DCA usage.
-class CellularAutomaton;
 /**
  * Description: Convenient class for communicating with a graphics server via various drawing methods. 
  *  This class encapsulates what a window created by the graphics server is.
@@ -147,14 +148,8 @@ class GraphicsClient {
          * Parameter: h - The height (in pixels) of the shape to draw.
          */
         void drawShapeHelper(int c, int x, int y, int w, int h);
-        void drawGUI();
-        void checkForMessages(CellularAutomaton* ca);
-        void clickEvent(int x, int y, CellularAutomaton* ca);
+        list<GCMessage*> checkForMessages();
         void requestFile();
-        void drawButton(int x, int y, int w, int h, string name);
-        int getShouldRefresh();
-        int getShouldExit();
-        void clearGame();
         void connectToAddress(string URL, int port);
     private:
         //Member/Field: string URL - The URL to the GraphicsClient connects to.
@@ -165,9 +160,6 @@ class GraphicsClient {
         int sockfd;
         //Member/Field: sockaddr_in serv_addr - The server address the GraphicsClient connects to.
         struct sockaddr_in serv_addr;
-
-        int shouldRefresh;
-        int shouldExit;
 };
 
 #endif

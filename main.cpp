@@ -1,9 +1,11 @@
-#include "GraphicsClient.h"
 #include <string>
 #include <iostream>
 #include <chrono>
 #include <sys/time.h>
 #include <ctime>
+#include "CAGraphicSimulator.h" 
+#include "GraphicsClient.h" 
+#include "CellularAutomaton.h" 
 using namespace std;
 
 int main(int argc, char **argv) {
@@ -16,17 +18,14 @@ int main(int argc, char **argv) {
     GraphicsClient gc = GraphicsClient("127.0.0.1", 7777);
     gc.setBackgroundColor(0, 0, 0);
     CellularAutomaton ca = CellularAutomaton(fileName, 0);
-    int shouldExit = 0; //Will store if the while loop should exit or not. Done for readability.
+    CAGraphicSimulator cags = CAGraphicSimulator(&gc, &ca);
     char input; //Stores the char the user enters into the console.
-    gc.drawGUI();
-    ca.displayCA(&gc);
-    while(!shouldExit) { //While the loop shouldn't exit.
-        gc.checkForMessages(&ca);
-        if(gc.getShouldRefresh()) {
-            ca.stepAndDisplayCA(&gc);
-        }
-        if(gc.getShouldExit()) {
-            shouldExit = 1;
+    cags.drawGUI();
+    cags.displayCA();
+    while(!cags.getShouldExit()) { //While the loop shouldn't exit.
+        cags.checkForMessages();
+        if(cags.getShouldRefresh()) {
+            cags.stepAndDisplayCA();
         }
         nanosleep((const struct timespec[]){{0, 100000000L}}, NULL);
     }
