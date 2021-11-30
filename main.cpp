@@ -19,7 +19,6 @@ int main(int argc, char **argv) {
     gc.setBackgroundColor(0, 0, 0);
     CellularAutomaton ca = CellularAutomaton(fileName, 0);
     CAGraphicSimulator cags = CAGraphicSimulator(&gc, &ca);
-    char input; //Stores the char the user enters into the console.
     cags.drawGUI();
     cags.displayCA();
     while(!cags.getShouldExit()) { //While the loop shouldn't exit.
