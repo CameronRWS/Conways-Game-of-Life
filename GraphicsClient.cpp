@@ -24,7 +24,7 @@ list<GCMessage*> GraphicsClient::checkForMessages() {
     for(int i = 0; i < count; i++) {
         if(message[i] == -1) { //start of message
             int len = (message[i+1] << 12) + (message[i+2] << 8) + (message[i+3] << 4) + message[i+4];
-            if(message[i+5] == 0x03) { //click
+            if(message[i+5] == 0x01) { //click
                 //The following lines of code read the next 8 nibbles and gets x and y values.
                 int x = (message[i+7] << 12) + (message[i+8] << 8) + (message[i+9] << 4) + (message[i+10]);
                 int y = (message[i+11] << 12) + (message[i+12] << 8) + (message[i+13] << 4) + (message[i+14]);
