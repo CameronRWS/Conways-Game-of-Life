@@ -6,7 +6,9 @@
 
 using namespace std;
 
-
+/**
+ * Description: Randomizes the states of the cells in the CA.
+ */
 void CellularAutomaton::randomize() {
     int maxIndex = this->width * this->height;
     for(int i = 0; i < maxIndex; i++) {
@@ -25,6 +27,9 @@ void CellularAutomaton::initCA() {
     }
 }
 
+/**
+ * Description: Sets the CA's size and gap based off of the value of m (see project specifications).
+ */
 void CellularAutomaton::setSizeAndGap() {
     int m = this->width > this->height ? this->width : this->height; //m per assignment specs.
     //The following thresholds were given in assignment specs.
@@ -121,14 +126,20 @@ CellularAutomaton::CellularAutomaton(int width, int height, unsigned char quiesc
 }
 
 /**
- * Description: A constructor for a CA that doesn't use a file to create the initial state.
+ * Description: A constructor for a CA that allows for a user to create the CA based off of a file and a quiescent state.
  * Parameter: fileName - A file path to a definition of a CA.
  * Parameter: quiescentState - The quiescent state (default state) of the new CA to create.
  */
 CellularAutomaton::CellularAutomaton(string fileName, int quiescentState) {
-    this->loadCAfromFile(fileName, quiescentState, 1);
+    this->loadCAfromFile(fileName, quiescentState, 1); //Loads the CA in the file and saves it as this CA.
 }
 
+/**
+ * Description: Loads a CA defined in a file into this CA.
+ * Parameter: fileName - A file path to a definition of a CA.
+ * Parameter: quiescentState - The quiescent state (default state) of the new CA to create.
+ * Parameter: shouldSaveFileName - Whether or not the file being passed in should be saved to the CA's file name.
+ */
 void CellularAutomaton::loadCAfromFile(string fileName, int quiescentState, int shouldSaveFileName) {
     if(this->cadata != NULL) {
         delete this->cadata;
@@ -183,6 +194,10 @@ CellularAutomaton::CellularAutomaton(const CellularAutomaton& originalCA) {
     this->deepCopy(originalCA);
 }
 
+/**
+ * Description: A deep copy method that copies the passed in CA into this CA.
+ * Parameter: toCopyCA - The CA to deep copy into this CA.
+ */
 void CellularAutomaton::deepCopy(const CellularAutomaton& toCopyCA) {
     this->cadata = NULL;
     this->cadata = new unsigned char[toCopyCA.width * toCopyCA.height];
@@ -279,6 +294,10 @@ unsigned char CellularAutomaton::getWrap() {
     return this->wrap;
 }
 
+/**
+ * Description: A getter for the CA's file name.
+ * Returns: string - The file name of the last loaded CA.
+ */
 string CellularAutomaton::getFileName() {
     return this->fileName;
 }

@@ -1,8 +1,8 @@
-main: main.o CAGraphicSimulator.o CellularAutomaton.o GraphicsClient.o GCMessage.o;
-	g++ main.o CAGraphicSimulator.o CellularAutomaton.o GraphicsClient.o GCMessage.o
+main: main.o CAGraphicsSimulator.o CellularAutomaton.o GraphicsClient.o GCMessage.o;
+	g++ main.o CAGraphicsSimulator.o CellularAutomaton.o GraphicsClient.o GCMessage.o
 	mv a.out gol.out 
 
-main.o: main.cpp CAGraphicSimulator.h GraphicsClient.h CellularAutomaton.h
+main.o: main.cpp CAGraphicsSimulator.h GraphicsClient.h CellularAutomaton.h
 	g++ -c main.cpp 
 
 GraphicsClient.o: GraphicsClient.cpp GraphicsClient.h GCMessage.h
@@ -14,8 +14,8 @@ CellularAutomaton.o: CellularAutomaton.cpp CellularAutomaton.h GraphicsClient.h
 GCMessage.o: GCMessage.cpp GCMessage.h
 	g++ -c GCMessage.cpp
 
-CAGraphicSimulator.o: CAGraphicSimulator.cpp CAGraphicSimulator.h GraphicsClient.h CellularAutomaton.h
-	g++ -c CAGraphicSimulator.cpp
+CAGraphicsSimulator.o: CAGraphicsSimulator.cpp CAGraphicsSimulator.h GraphicsClient.h CellularAutomaton.h
+	g++ -c CAGraphicsSimulator.cpp
 
 clean: 
 	rm *.o

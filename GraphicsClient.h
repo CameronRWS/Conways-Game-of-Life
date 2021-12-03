@@ -148,7 +148,7 @@ class GraphicsClient {
          * Parameter: h - The height (in pixels) of the shape to draw.
          */
         void drawShapeHelper(int c, int x, int y, int w, int h);
-        list<GCMessage*> checkForMessages();
+        list<GCMessage> checkForMessages();
         void requestFile();
         void connectToAddress(string URL, int port);
     private:

@@ -6,22 +6,22 @@ GCMessage::GCMessage(int messageType, string message) {
     this->message = message;
 }
 
-GCMessage::GCMessage(const GCMessage& originalGCM) {
-    this->message = originalGCM.message;
-    this->messageType = originalGCM.messageType;
-}
+// GCMessage::GCMessage(const GCMessage& originalGCM) {
+//     this->message = originalGCM.message;
+//     this->messageType = originalGCM.messageType;
+// }
 
-GCMessage::~GCMessage() {
+// GCMessage::~GCMessage() {
 
-}
+// }
 
-GCMessage& GCMessage::operator=(const GCMessage& toCopyGCM) {
-    if (this != &toCopyGCM) {
-        this->message = toCopyGCM.message;
-        this->messageType = toCopyGCM.messageType;
-    }
-    return *this;
-}
+// GCMessage& GCMessage::operator=(const GCMessage& toCopyGCM) {
+//     if (this != &toCopyGCM) {
+//         this->message = toCopyGCM.message;
+//         this->messageType = toCopyGCM.messageType;
+//     }
+//     return *this;
+// }
 
 
 int GCMessage::getMessageType() {

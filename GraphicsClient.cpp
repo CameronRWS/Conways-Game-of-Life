@@ -14,37 +14,36 @@
 
 using namespace std;
 
-list<GCMessage*> GraphicsClient::checkForMessages() {
-    list<GCMessage*> listOfGCM;
-    int count; //number of bytes that can be read.
-    ioctl(this->sockfd, FIONREAD, &count); 
-    if(count == 0) { return listOfGCM; }
-    char message[count];
-    read(this->sockfd, message, count);
-    for(int i = 0; i < count; i++) {
-        if(message[i] == -1) { //start of message
-            int len = (message[i+1] << 12) + (message[i+2] << 8) + (message[i+3] << 4) + message[i+4];
-            if(message[i+5] == 0x01) { //click
+list<GCMessage> GraphicsClient::checkForMessages() {
+    list<GCMessage> listOfGCM; //A list of the messages send from the Graphics Server.
+    int count; //Number of bytes that can be read.
+    ioctl(this->sockfd, FIONREAD, &count); //Gets the number of bytes ready to be read.
+    if(count == 0) { return listOfGCM; } //If there are no messages, then return the list empty.
+    char message[count]; //Declare an array of chars that will hold the messages from the Graphics Server.
+    read(this->sockfd, message, count); //Read the message bytes into the message variable.
+    for(int i = 0; i < count; i++) { //For each byte in the message.
+        if(message[i] == -1) { //If we are at the start of a message.
+            int len = (message[i+1] << 12) + (message[i+2] << 8) + (message[i+3] << 4) + message[i+4]; //Get the length of the message.
+            if(message[i+5] == 0x01) { //If the message sent is a click message.
                 //The following lines of code read the next 8 nibbles and gets x and y values.
                 int x = (message[i+7] << 12) + (message[i+8] << 8) + (message[i+9] << 4) + (message[i+10]);
                 int y = (message[i+11] << 12) + (message[i+12] << 8) + (message[i+13] << 4) + (message[i+14]);
-                //create message and add to list.
-                GCMessage* gcm = new GCMessage(1, to_string(x) + "," + to_string(y));
+                //Create GCMessage for this click and add to list of messages to send to client.
+                GCMessage gcm = GCMessage(1, to_string(x) + "," + to_string(y));
                 listOfGCM.push_back(gcm);
-            } else if(message[i+5] == 0x0A) { //file
-                int filePathLen = (len-1)/2; //-1 to remove the file command and /2 since each char takes up 2 nibbles.
-                string filePath = "";
-                for(int j = 0; j < filePathLen; j++) {
-                    int chr1 = message[i+6+(j*2)] << 4;
-                    int chr2 = message[i+7+(j*2)];
-                    int chr = chr1 + chr2;
+            } else if(message[i+5] == 0x0A) { //If the message sent is a file message.
+                int filePathLen = (len-1)/2; //"len-1" to remove the file command from message length and "/2" since each char takes up 2 nibbles.
+                string filePath = ""; //Declare an empty string where the file path will eventually go.
+                for(int j = 0; j < filePathLen; j++) { //For each char in the file path part of the message.
+                    //The following lines gets the char in the message and appends to the end of the filePath variable.
+                    int chr = (message[i+6+(j*2)] << 4) + message[i+7+(j*2)];
                     filePath = filePath + (char)chr;
                 }
-                //create message and add to list.
-                GCMessage* gcm = new GCMessage(2, filePath);
+                //Create GCMessage for this file and add to list of messages to send to client.
+                GCMessage gcm = GCMessage(2, filePath);
                 listOfGCM.push_back(gcm);
             }
-            i = i + len; //skip over the read characters. 
+            i = i + len; //Skip over the read characters in our message array since they were just read.
         }
     }
     return listOfGCM;

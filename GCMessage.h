@@ -8,9 +8,9 @@ using namespace std;
 class GCMessage {
     public:
         GCMessage(int messageType, string message);
-        GCMessage(const GCMessage& originalGCM);
-        ~GCMessage();
-        GCMessage& operator=(const GCMessage& toCopyGCM);
+        // GCMessage(const GCMessage& originalGCM);
+        // ~GCMessage();
+        // GCMessage& operator=(const GCMessage& toCopyGCM);
         int getMessageType();
         string getMessage();
     private:
