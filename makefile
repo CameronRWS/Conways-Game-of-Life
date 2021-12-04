@@ -1,22 +1,24 @@
-main: main.o CAGraphicsSimulator.o CellularAutomaton.o GraphicsClient.o GCMessage.o;
-	g++ main.o CAGraphicsSimulator.o CellularAutomaton.o GraphicsClient.o GCMessage.o
-	mv a.out gol.out 
+CXXFLAGS += -std=c++11
+CXX=g++
 
-main.o: main.cpp CAGraphicsSimulator.h GraphicsClient.h CellularAutomaton.h
-	g++ -c main.cpp 
+gol: casimulator.o CAGraphicsSimulator.o CellularAutomaton.o GraphicsClient.o GCMessage.o;
+	g++ -o $@ $^
+
+casimulator.o: casimulator.cpp CAGraphicsSimulator.h GraphicsClient.h CellularAutomaton.h
 
 GraphicsClient.o: GraphicsClient.cpp GraphicsClient.h GCMessage.h
-	g++ -c GraphicsClient.cpp
 
 CellularAutomaton.o: CellularAutomaton.cpp CellularAutomaton.h GraphicsClient.h
-	g++ -c CellularAutomaton.cpp
 
 GCMessage.o: GCMessage.cpp GCMessage.h
-	g++ -c GCMessage.cpp
 
 CAGraphicsSimulator.o: CAGraphicsSimulator.cpp CAGraphicsSimulator.h GraphicsClient.h CellularAutomaton.h
-	g++ -c CAGraphicsSimulator.cpp
+
+%.o : %.cpp
+	$(CXX) $(CXXFLAGS) -c $<
 
 clean: 
-	rm *.o
-	rm *.out
+	-rm *.o
+	-rm gol
+
+.PHONY: clean run

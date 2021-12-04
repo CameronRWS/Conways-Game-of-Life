@@ -3,6 +3,7 @@
 #include "CAGraphicsSimulator.h" 
 #include "GraphicsClient.h" 
 #include "CellularAutomaton.h" 
+
 using namespace std;
 
 int main(int argc, char **argv) {
@@ -12,9 +13,9 @@ int main(int argc, char **argv) {
         return 1; //Return 1 since there is an error.
     }
     string fileName = argv[1]; //Get the file name from command line input.
-    GraphicsClient gc = GraphicsClient("127.0.0.1", 7777);
-    CellularAutomaton ca = CellularAutomaton(fileName, 0);
-    CAGraphicsSimulator cags = CAGraphicsSimulator(&gc, &ca);
+    GraphicsClient gc("127.0.0.1", 7777);
+    CellularAutomaton ca(fileName, 0);
+    CAGraphicsSimulator cags(&gc, &ca);
     cags.simulate();
     return 0;
 }

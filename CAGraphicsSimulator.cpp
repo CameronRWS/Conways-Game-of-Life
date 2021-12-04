@@ -2,7 +2,14 @@
 #include "CAGraphicsSimulator.h" 
 #include "GraphicsClient.h" 
 #include "CellularAutomaton.h" 
+#include <iostream> //For creating file.
+#include <fstream> //For creating file.
 #include <math.h> //For use of floor.
+#include <time.h> //For use of nanosleep.
+#include <sstream> //For converting date to string.
+#include <iomanip> //For use of put_time. 
+
+using namespace std;
 
 const int padding = 4; //padding for GUI.
 const int screen_w = 800;
@@ -20,10 +27,11 @@ const int reset_btn_y  = 10+(btn_gap*3);
 const int random_btn_y = 10+(btn_gap*4);
 const int clear_btn_y  = 10+(btn_gap*5);
 const int load_btn_y   = 10+(btn_gap*6);
-const int quit_btn_y   = 10+(btn_gap*7);
-const int size1_btn_y  = 10+(btn_gap*8);
-const int size2_btn_y  = 10+(btn_gap*9);
-const int size3_btn_y  = 10+(btn_gap*10);
+const int save_btn_y   = 10+(btn_gap*7);
+const int quit_btn_y   = 10+(btn_gap*8);
+const int size1_btn_y  = 10+(btn_gap*9);
+const int size2_btn_y  = 10+(btn_gap*10);
+const int size3_btn_y  = 10+(btn_gap*11);
 const int drawing_color_r = 255;
 const int drawing_color_g = 200;
 const int drawing_color_b = 20;
@@ -40,6 +48,27 @@ const int bg_color_b = 40;
  * Parameter: int y - The y position of the cell that needs it's next state calculated.
  */
 unsigned char ruleGameOfLife(CellularAutomaton *tempCA, int x, int y); 
+
+void CAGraphicsSimulator::saveCAToFile() {
+    //The following lines gets the current time for the file name.
+    time_t theTime = time(nullptr);
+    tm theLocalTime = *localtime(&theTime);
+    std::ostringstream oss;
+    oss << put_time(&theLocalTime, "%m-%d-%y_%I-%M-%S");
+    //The following lines create a file with the following name.
+    ofstream theFile("./savedCAs/savedCA_" + oss.str() + ".txt");
+    //The following lines prints the CA to the file.
+    int maxIndex = this->ca->getWidth() * this->ca->getHeight(); 
+    theFile << this->ca->getWidth() << " " << this->ca->getHeight() << "\n"; //Put the dimensions at the top.
+    for(int i = 0; i < maxIndex; i++) { //For all cells within the CA.
+        if(i % (this->ca->getWidth()) == 0 && i != 0) { //If i is at the end of a row, create a new line.
+            theFile << "\n" << (int)this->ca->getCAdata()[i] << " "; //Print the return char then the char with a space after it.
+        } else {
+            theFile << (int)this->ca->getCAdata()[i] << " "; //Print the char with a space after it.
+        }
+    }
+    theFile.close(); //Close file.
+}
 
 /** 
  * Description: Constructs a CAGraphicsSimulator object.
@@ -85,12 +114,12 @@ void CAGraphicsSimulator::checkForAndExecuteMessages() {
     list<GCMessage> listOfGCM = this->gc->checkForMessages(); //Get the messages to execute.
     //Execute the messages if there are any.
     for (list<GCMessage>::iterator it = listOfGCM.begin(); it != listOfGCM.end(); ++it) { //For each message.
-        string message = (it)->getMessage();
-        if((it)->getMessageType() == 1) {
+        string message = it->getMessage();
+        if(it->getMessageType() == 1) {
             string x_str = message.substr(0, message.find(","));
             string y_str = message.substr(message.find(",")+1, message.length());
             this->clickEvent(stoi(x_str), stoi(y_str));
-        } else if ((it)->getMessageType() == 2) {
+        } else if (it->getMessageType() == 2) {
             this->ca->loadCAfromFile(message, this->ca->getQuiescentState(), 1);
             this->displayCA();
         }
@@ -159,6 +188,8 @@ void CAGraphicsSimulator::clickEvent(int x, int y) {
         } else if(y > load_btn_y && y < load_btn_y + btn_h) {
             this->shouldStep = 0; //Stop auto simulate.
             this->gc->requestFile(); //Tell the GC to prompt the user for a file to load.
+        } else if(y > save_btn_y && y < save_btn_y + btn_h) {
+            this->saveCAToFile();
         } else if(y > quit_btn_y && y < quit_btn_y + btn_h) {
             this->shouldExit = 1; //Exit the program.
         } else if(y > size1_btn_y && y < size1_btn_y + btn_h) {
@@ -223,6 +254,7 @@ void CAGraphicsSimulator::drawGUI() {
     this->drawButton(all_btn_x, random_btn_y, btn_w, btn_h, "RANDOM");
     this->drawButton(all_btn_x, clear_btn_y, btn_w, btn_h, "CLEAR");
     this->drawButton(all_btn_x, load_btn_y, btn_w, btn_h, "LOAD");
+    this->drawButton(all_btn_x, save_btn_y, btn_w, btn_h, "SAVE");
     this->drawButton(all_btn_x, quit_btn_y, btn_w, btn_h, "QUIT");
     this->drawButton(all_btn_x, size1_btn_y, btn_w, btn_h, "SIZE 1");
     this->drawButton(all_btn_x, size2_btn_y, btn_w, btn_h, "SIZE 2");

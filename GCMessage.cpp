@@ -1,33 +1,30 @@
 #include <string> //For using strings.
 #include "GCMessage.h" //Allows for GCM usage.
 
+using namespace std;
+
+/**
+ * Description: A parameterized constructor for a GCMessage object.
+ * Parameter: messageType - The type of the message contained.
+ * Parameter: message - The message information.
+ */
 GCMessage::GCMessage(int messageType, string message) {
     this->messageType = messageType;
     this->message = message;
 }
 
-// GCMessage::GCMessage(const GCMessage& originalGCM) {
-//     this->message = originalGCM.message;
-//     this->messageType = originalGCM.messageType;
-// }
-
-// GCMessage::~GCMessage() {
-
-// }
-
-// GCMessage& GCMessage::operator=(const GCMessage& toCopyGCM) {
-//     if (this != &toCopyGCM) {
-//         this->message = toCopyGCM.message;
-//         this->messageType = toCopyGCM.messageType;
-//     }
-//     return *this;
-// }
-
-
+/**
+ * Description: A getter for the GCMessages's message type.
+ * Returns: int - The message type of the GCMessage.
+ */
 int GCMessage::getMessageType() {
     return this->messageType;
 }
 
+/**
+ * Description: A getter for the GCMessages's message.
+ * Returns: string - The message of the GCMessage.
+ */
 string GCMessage::getMessage() {
     return this->message;
 }

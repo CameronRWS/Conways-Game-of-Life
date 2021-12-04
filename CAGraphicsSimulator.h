@@ -10,6 +10,9 @@ using namespace std;
 class CAGraphicsSimulator {
     public:
         CAGraphicsSimulator(GraphicsClient* gc, CellularAutomaton* ca);
+        CAGraphicsSimulator(const CAGraphicsSimulator&) = delete;
+        CAGraphicsSimulator& operator=(const CAGraphicsSimulator&) = delete;
+        ~CAGraphicsSimulator() = default;
         void drawButton(int x, int y, int w, int h, string name);
         int getShouldStep();
         int getShouldExit();
@@ -21,6 +24,7 @@ class CAGraphicsSimulator {
         void stepAndDisplayCA();
         void checkForCAClick(int x, int y);
         void simulate();
+        void saveCAToFile();
     private:
         GraphicsClient* gc;
         CellularAutomaton* ca;
