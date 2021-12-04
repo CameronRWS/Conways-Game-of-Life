@@ -21,4 +21,7 @@ clean:
 	-rm *.o
 	-rm gol
 
+run:
+	./gol "./predefinedCAs/gliderwar.txt"
+
 .PHONY: clean run

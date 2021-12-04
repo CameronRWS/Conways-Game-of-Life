@@ -24,7 +24,7 @@ make
 ```
 Run this command to run the project.
 ```sh
-./gol.out <text file path to CA definition (string)>
+./gol <text file path to CA definition (string)>
 ```
 Run this command to clean the project (remove *.o and *.out files).
 ```sh

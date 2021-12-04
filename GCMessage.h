@@ -8,12 +8,14 @@ using namespace std;
 class GCMessage {
     public:
         GCMessage(int messageType, string message);
+        GCMessage(const GCMessage&) = default;
+        GCMessage& operator=(const GCMessage&) = default;
         ~GCMessage() = default;
         int getMessageType();
         string getMessage();
     private:
-        int messageType; //1 => click, 2 => file
-        string message; //1 => "x,y", 2 => fileName
+        int messageType;
+        string message;
 };
 
 #endif
