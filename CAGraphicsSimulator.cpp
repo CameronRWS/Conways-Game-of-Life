@@ -74,39 +74,15 @@ const int message_type_file = 2;
  *      and it's surrounding 8 cells (it's neighborhood). Rule is based off of Conway's Game of Life.
  * Parameter: CellularAutomaton *tempCA - A pointer to the temporary CA object that holds the 
  *      original CA.
- * Parameter: int x - The x position of the cell that needs it's next state calculated.
- * Parameter: int y - The y position of the cell that needs it's next state calculated.
+ * Parameter: x - The x position of the cell that needs it's next state calculated.
+ * Parameter: y - The y position of the cell that needs it's next state calculated.
  */
 unsigned char ruleGameOfLife(CellularAutomaton *tempCA, int x, int y); 
 
 /** 
- * Description: Saves the displayed CA as the text representation.
- */
-void CAGraphicsSimulator::saveCAToFile() {
-    //The following lines gets the current time for the file name.
-    time_t theTime = time(nullptr);
-    tm theLocalTime = *localtime(&theTime);
-    std::ostringstream oss;
-    oss << put_time(&theLocalTime, "%m-%d-%y_%I-%M-%S");
-    //The following lines create a file with the following name.
-    ofstream theFile("./savedCAs/savedCA_" + oss.str() + ".txt");
-    //The following lines prints the CA to the file.
-    int maxIndex = this->ca->getWidth() * this->ca->getHeight(); 
-    theFile << this->ca->getWidth() << " " << this->ca->getHeight() << "\n"; //Put the dimensions at the top.
-    for(int i = 0; i < maxIndex; i++) { //For all cells within the CA.
-        if(i % (this->ca->getWidth()) == 0 && i != 0) { //If i is at the end of a row, create a new line.
-            theFile << "\n" << (int)this->ca->getCAdata()[i] << " "; //Print the return char then the char with a space after it.
-        } else {
-            theFile << (int)this->ca->getCAdata()[i] << " "; //Print the char with a space after it.
-        }
-    }
-    theFile.close(); //Close file.
-}
-
-/** 
  * Description: Constructs a CAGraphicsSimulator object.
- * Parameter: GraphicsClient *gc - A pointer to the GC object that the CA will be displayed on.
- * Parameter: CellularAutomaton *ca - A pointer to the CA object that will be simulated graphically.
+ * Parameter: gc - A pointer to the GC object that the CA will be displayed on.
+ * Parameter: ca - A pointer to the CA object that will be simulated graphically.
  */
 CAGraphicsSimulator::CAGraphicsSimulator(GraphicsClient* gc, CellularAutomaton* ca) {
     this->gc = gc;
@@ -132,16 +108,23 @@ void CAGraphicsSimulator::simulate() {
 }
 
 /** 
- * Description: Logs text graphically in the corner of the Graphics Window.
+ * Description: Draws a button on the Graphics Window.
+ * Parameter: x - The x coord of where the button should start (top left).
+ * Parameter: y - The y coord of where the button should start (top left).
+ * Parameter: w - The width the button should be in pixels.
+ * Parameter: h - The height the button should be in pixels.
+ * Parameter: name - The label the button should receive.
  */
-void CAGraphicsSimulator::logEvent(string text) {
-    //The following lines clear old log.
-    this->gc->setDrawingColor(bg_color_r,bg_color_g,bg_color_b);
-    this->gc->fillRectangle(game_w+padding,divider_y+padding,gui_w-(padding*2),log_h);
-    //The following lines draw the text.
+void CAGraphicsSimulator::drawButton(int x, int y, int w, int h, string name) {
+    //Outline drawing color rectangle.
     this->gc->setDrawingColor(drawing_color_r,drawing_color_g,drawing_color_b);
-    this->gc->drawstring(game_w+padding+5, log_text_y, ">> " + text);
-    this->gc->repaint(); //Update the screen to display the newly drawn CA.
+    this->gc->fillRectangle(x,y,w,h);
+    //Smaller background color rectangle.
+    this->gc->setDrawingColor(bg_color_r,bg_color_g,bg_color_b);
+    this->gc->fillRectangle(x+padding,y+padding,w-(padding*2),h-(padding*2)); 
+    //Drawing color text for button label.
+    this->gc->setDrawingColor(drawing_color_r,drawing_color_g,drawing_color_b);
+    this->gc->drawstring((x+10),(y+20), name);
 }
 
 /** 
@@ -209,8 +192,8 @@ void CAGraphicsSimulator::stepAndDisplayCA() {
 
 /** 
  * Description: Handles when the user clicks on the Graphics Client.
- * Parameter: int x - The x coord of where the user clicked.
- * Parameter: int y - The y coord of where the user clicked.
+ * Parameter: x - The x coord of where the user clicked.
+ * Parameter: y - The y coord of where the user clicked.
  */
 void CAGraphicsSimulator::clickEvent(int x, int y) {
     if(x > all_btn_x && x < all_btn_x + btn_w) { //If the click was within the x button area.
@@ -274,15 +257,16 @@ void CAGraphicsSimulator::clickEvent(int x, int y) {
 
 /** 
  * Description: Checks to see if the user clicked on a CA cell, and if so flips the cell state.
- * Parameter: int x - The x coord of where the user clicked.
- * Parameter: int y - The y coord of where the user clicked.
+ * Parameter: x - The x coord of where the user clicked.
+ * Parameter: y - The y coord of where the user clicked.
  */
 void CAGraphicsSimulator::checkForCAClick(int x, int y) {
     //The following lines calculates the width and height of the CA in pixels.
     int displayedCAwidth = this->ca->getWidth()*this->ca->getSize() + (this->ca->getWidth()-1)*this->ca->getGap();
     int displayedCAheight = this->ca->getHeight()*this->ca->getSize() + (this->ca->getHeight()-1)*this->ca->getGap();
     if(x < displayedCAwidth && y < displayedCAheight) { //If the CA was clicked.
-        //I could have checked if they clicked a gap or not, but with the supported CA sizes this made the smaller CA sizes harder to toggle cells.
+        // if((x % (this->ca->getSize()+this->ca->getGap())) <= this->ca->getSize() && (y % (this->ca->getSize()+this->ca->getGap())) <= this->ca->getSize()) { //If a gap wasn't clicked.
+        //I could have checked if they clicked a gap or not, but with the supported CA sizes this made the smaller CA sizes harder to toggle cells and I would prefer immediate feedback.
         int ca_x = floor(x/(this->ca->getSize()+this->ca->getGap())); //Get x coord in the CA.
         int ca_y = floor(y/(this->ca->getSize()+this->ca->getGap())); //Get y coord in the CA.
         int index = (ca_y*this->ca->getWidth() + ca_x); //Calculated index of the cell clicked.
@@ -300,8 +284,8 @@ void CAGraphicsSimulator::checkForCAClick(int x, int y) {
 
 /** 
  * Description: Draws the GUI and it's buttons on the Graphics Window.
- * Parameter: int x - The x coord of where the user clicked.
- * Parameter: int y - The y coord of where the user clicked.
+ * Parameter: x - The x coord of where the user clicked.
+ * Parameter: y - The y coord of where the user clicked.
  */
 void CAGraphicsSimulator::drawGUI() {
     //Outline drawing color rectangle.
@@ -329,23 +313,43 @@ void CAGraphicsSimulator::drawGUI() {
 }
 
 /** 
- * Description: Draws a button on the Graphics Window.
- * Parameter: int x - The x coord of where the button should start (top left).
- * Parameter: int y - The y coord of where the button should start (top left).
- * Parameter: int w - The width the button should be in pixels.
- * Parameter: int h - The height the button should be in pixels.
- * Parameter: string name - The label the button should receive.
+ * Description: Saves the displayed CA as the text representation.
  */
-void CAGraphicsSimulator::drawButton(int x, int y, int w, int h, string name) {
-    //Outline drawing color rectangle.
-    this->gc->setDrawingColor(drawing_color_r,drawing_color_g,drawing_color_b);
-    this->gc->fillRectangle(x,y,w,h);
-    //Smaller background color rectangle.
+void CAGraphicsSimulator::saveCAToFile() {
+    //The following lines gets the current time for the file name.
+    time_t theTime = time(nullptr);
+    tm theLocalTime = *localtime(&theTime);
+    std::ostringstream oss;
+    oss << put_time(&theLocalTime, "%m-%d-%y_%I-%M-%S");
+    string theFileName = "./savedCAs/savedCA_" + oss.str() + ".txt";
+    //The following lines create a file with the following name.
+    ofstream theFile(theFileName);
+    //The following lines prints the CA to the file.
+    int maxIndex = this->ca->getWidth() * this->ca->getHeight(); 
+    theFile << this->ca->getWidth() << " " << this->ca->getHeight() << "\n"; //Put the dimensions at the top.
+    for(int i = 0; i < maxIndex; i++) { //For all cells within the CA.
+        if(i % (this->ca->getWidth()) == 0 && i != 0) { //If i is at the end of a row, create a new line.
+            theFile << "\n" << (int)this->ca->getCAdata()[i] << " "; //Print the return char then the char with a space after it.
+        } else {
+            theFile << (int)this->ca->getCAdata()[i] << " "; //Print the char with a space after it.
+        }
+    }
+    theFile.close(); //Close file.
+    //This loads the file that was just saved so when the user resets they get their recently saved CA.
+    this->ca->loadCAfromFile(theFileName, ca->getQuiescentState(), 1); //Load the saved CA and save the file name.
+}
+
+/** 
+ * Description: Logs text graphically in the corner of the Graphics Window.
+ */
+void CAGraphicsSimulator::logEvent(string text) {
+    //The following lines clear old log.
     this->gc->setDrawingColor(bg_color_r,bg_color_g,bg_color_b);
-    this->gc->fillRectangle(x+padding,y+padding,w-(padding*2),h-(padding*2)); 
-    //Drawing color text for button label.
+    this->gc->fillRectangle(game_w+padding,divider_y+padding,gui_w-(padding*2),log_h);
+    //The following lines draw the text.
     this->gc->setDrawingColor(drawing_color_r,drawing_color_g,drawing_color_b);
-    this->gc->drawstring((x+10),(y+20), name);
+    this->gc->drawstring(game_w+padding+5, log_text_y, ">> " + text);
+    this->gc->repaint(); //Update the screen to display the newly drawn CA.
 }
 
 /** 
@@ -353,8 +357,8 @@ void CAGraphicsSimulator::drawButton(int x, int y, int w, int h, string name) {
  *      and it's surrounding 8 cells (it's neighborhood). Rule is based off of Conway's Game of Life.
  * Parameter: CellularAutomaton *tempCA - A pointer to the temporary CA object that holds the 
  *      original CA.
- * Parameter: int x - The x position of the cell that needs it's next state calculated.
- * Parameter: int y - The y position of the cell that needs it's next state calculated.
+ * Parameter: x - The x position of the cell that needs it's next state calculated.
+ * Parameter: y - The y position of the cell that needs it's next state calculated.
  */
 unsigned char ruleGameOfLife(CellularAutomaton *tempCA, int x, int y) {
     //The following variables will store the various neighbors (8) and the current cell (c).
