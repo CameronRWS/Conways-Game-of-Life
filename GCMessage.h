@@ -1,10 +1,13 @@
 #include <string> //For using strings.
 
-using namespace std;
+using namespace std; //Allows for 'std::' to be removed from certain lines.
 
 #ifndef GCM_HEADER
 #define GCM_HEADER
 
+/** 
+ * Description: Stores a Graphics Client message.
+ */
 class GCMessage {
     public:
         GCMessage(int messageType, string message);

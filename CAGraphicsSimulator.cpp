@@ -1,7 +1,7 @@
 
-#include "CAGraphicsSimulator.h" 
-#include "GraphicsClient.h" 
-#include "CellularAutomaton.h" 
+#include "CAGraphicsSimulator.h" //For use of CAGS.
+#include "GraphicsClient.h" //For use of GC.
+#include "CellularAutomaton.h" //For use of CA.
 #include <iostream> //For creating file.
 #include <fstream> //For creating file.
 #include <math.h> //For use of floor.
@@ -9,7 +9,7 @@
 #include <sstream> //For converting date to string.
 #include <iomanip> //For use of put_time. 
 
-using namespace std;
+using namespace std; //Allows for 'std::' to be removed from certain lines.
 
 //The following are constants for displaying the CA and GUI (in pixels).
 //The padding or border of the GUI.

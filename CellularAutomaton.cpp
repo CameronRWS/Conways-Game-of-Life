@@ -4,7 +4,7 @@
 #include "CellularAutomaton.h" //Allows for 2DCA usage.
 #include <math.h> //For use of floor.
 
-using namespace std;
+using namespace std; //Allows for 'std::' to be removed from certain lines.
 
 /**
  * Description: A constructor for a CA that allows for a user to create the CA based off of a file and a quiescent state.
@@ -48,7 +48,7 @@ CellularAutomaton::CellularAutomaton(const CellularAutomaton& originalCA) : cada
  */
 CellularAutomaton::~CellularAutomaton() {
     delete this->cadata; //Free the cells array that were put on the heap.
-    this->cadata = NULL;
+    this->cadata = NULL; //Ensures cadata isn't successfully used again.
 }
 
 /**

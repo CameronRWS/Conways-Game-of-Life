@@ -1,11 +1,11 @@
+#include <string> //For using strings.
+#include "GraphicsClient.h" //Graphics client header.
 
-#include <string>
-
-using namespace std;
+using namespace std; //Allows for 'std::' to be removed from certain lines.
 
 #ifndef CA_HEADER
 #define CA_HEADER
-#include "GraphicsClient.h" //Graphics client header.
+
 /** 
  * Description: Stores a CA in a convenient class with various methods to modify the CA.
  */

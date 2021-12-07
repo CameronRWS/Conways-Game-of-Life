@@ -1,17 +1,18 @@
 #include <stdio.h> //From socket code for input/output in C.
 #include <stdlib.h> //From socket code.
-#include <sys/socket.h> //From socket code
-#include <arpa/inet.h> //From socket code
-#include <unistd.h> //From socket code
+#include <sys/socket.h> //From socket code.
+#include <arpa/inet.h> //From socket code.
+#include <unistd.h> //From socket code.
 #include <string> //For using strings.
 #include <iostream> //input/output in C++ (not the same as stdio.h).
 #include <list> //For using lists, specifically for messages.
 #include "GCMessage.h" //Allows for GCM usage.
 
-using namespace std;
+using namespace std; //Allows for 'std::' to be removed from certain lines.
 
 #ifndef GC_HEADER
 #define GC_HEADER
+
 /**
  * Description: Convenient class for communicating with a graphics server via various drawing methods. 
  *  This class encapsulates what a window created by the graphics server is.

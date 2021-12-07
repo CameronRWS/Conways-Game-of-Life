@@ -12,7 +12,7 @@
 #include "GraphicsClient.h" //Graphics client header.
 #include "GCMessage.h" //Allows for GCM usage.
 
-using namespace std;
+using namespace std; //Allows for 'std::' to be removed from certain lines.
 
 //A constant that represents when a message is a click message.
 const int message_type_click = 1;

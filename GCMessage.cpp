@@ -1,7 +1,7 @@
 #include <string> //For using strings.
 #include "GCMessage.h" //Allows for GCM usage.
 
-using namespace std;
+using namespace std; //Allows for 'std::' to be removed from certain lines.
 
 /**
  * Description: A parameterized constructor for a GCMessage object.

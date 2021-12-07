@@ -1,13 +1,15 @@
-# COMS 327 - Project 2 Part A
-This part of the project is an implementation of Conway's Game of Life displayed graphically.
+# COMS 327 - Project 2 Part B
+This part of the project is an implementation of Conway's Game of Life displayed on a graphics window with the ability for user interaction.
 
 ## Key Datastructures
 
 - CellularAutomaton.h - Stores a CA in a convenient class with various methods to modify the CA.
-- GraphicsClient.h - Convenient class for communicating with a graphics server via various drawing methods. This class encapsulates what a window created by the graphics server is.
+- GraphicsClient.h - Convenient class for communicating with a graphics server/window via various drawing methods. This class encapsulates what a window created by the graphics server is.
+- GCMessage.h - Stores a Graphics Client message.
+- CAGraphicsSimulator.h - Simulates a Cellular Automaton graphically. Handles all of the logic that is unique to simulating the Cellular Automaton using the Graphics Client without having to modify what the CA and GC class do.
 
 ## Source Files
-##### main.cpp - Connects to a GraphicsServer and simulates a Cellular Automaton.
+##### casimulator.cpp - Connects to a Graphics Window and simulates a Cellular Automaton.
 
 - Also contains a function for calculating the next state of a cell in a Cellular Automaton. This step function is based on Conway's Game of Life.
 
@@ -15,7 +17,7 @@ This part of the project is an implementation of Conway's Game of Life displayed
 
 - void CellularAutomaton::initCA() -> Initiates the CA by setting all cells to the quiescent state.
 
-- void CellularAutomaton::displayCAToConsole() -> Displays the state of the CA to the console (like in project 1 part c). This method is used for debugging.
+- void CellularAutomaton::displayCAToConsole() -> Displays the state of the CA to the console (like in project 1 part c). This mezthod is used for debugging.
 
 - void CellularAutomaton::displayCA(GraphicsClient* gc) -> Displays the state of the CA to the passed in GraphicsClient.
 
