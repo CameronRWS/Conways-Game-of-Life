@@ -14,6 +14,11 @@
 
 using namespace std;
 
+//A constant that represents when a message is a click message.
+const int message_type_click = 1;
+//A constant that represents when a message is a file message.
+const int message_type_file = 2;
+
 /**
  * Description: A parameterized constructor for a GraphicsClient object.
  * Parameter: URL - The url address the GraphicsClient should connect to.
@@ -356,7 +361,7 @@ list<GCMessage> GraphicsClient::checkForMessages() {
                 int x = (message[i+7] << 12) + (message[i+8] << 8) + (message[i+9] << 4) + (message[i+10]);
                 int y = (message[i+11] << 12) + (message[i+12] << 8) + (message[i+13] << 4) + (message[i+14]);
                 //Create GCMessage for this click and add to list of messages to send to client.
-                GCMessage gcm = GCMessage(1, to_string(x) + "," + to_string(y));
+                GCMessage gcm = GCMessage(message_type_click, to_string(x) + "," + to_string(y));
                 listOfGCM.push_back(gcm);
             } else if(message[i+5] == 0x0A) { //If the message sent is a file message.
                 int filePathLen = (len-1)/2; //"len-1" to remove the file command from message length and "/2" since each char takes up 2 nibbles.
@@ -367,7 +372,7 @@ list<GCMessage> GraphicsClient::checkForMessages() {
                     filePath = filePath + (char)chr;
                 }
                 //Create GCMessage for this file and add to list of messages to send to client.
-                GCMessage gcm = GCMessage(2, filePath);
+                GCMessage gcm = GCMessage(message_type_file, filePath);
                 listOfGCM.push_back(gcm);
             }
             i = i + len; //Skip over the read characters in our message array since they were just read.

@@ -5,7 +5,7 @@
 #include <unistd.h> //From socket code
 #include <string> //For using strings.
 #include <iostream> //input/output in C++ (not the same as stdio.h).
-#include <list>
+#include <list> //For using lists, specifically for messages.
 #include "GCMessage.h" //Allows for GCM usage.
 
 using namespace std;

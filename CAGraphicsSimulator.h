@@ -25,6 +25,7 @@ class CAGraphicsSimulator {
         void checkForCAClick(int x, int y);
         void simulate();
         void saveCAToFile();
+        void logEvent(string text);
     private:
         GraphicsClient* gc;
         CellularAutomaton* ca;

@@ -14,7 +14,9 @@ class GCMessage {
         int getMessageType();
         string getMessage();
     private:
+        //Member/Field: int messageType - The type of information stored in the message.
         int messageType;
+        //Member/Field: string message - The contents of the message.
         string message;
 };
 

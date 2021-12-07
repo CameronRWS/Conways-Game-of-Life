@@ -11,33 +11,63 @@
 
 using namespace std;
 
-const int padding = 4; //padding for GUI.
+//The following are constants for displaying the CA and GUI (in pixels).
+//The padding or border of the GUI.
+const int padding = 4;
+//The width of the display screen.
 const int screen_w = 800;
+//The width of the GUI.
 const int gui_w = 200;
+//The width of the game (where the CA can be displayed).
 const int game_w = 600;
+//The height of the game.
 const int game_h = 600;
-const int btn_w = 80;
+//The width of the buttons.
+const int btn_w = 182;
+//The height of the buttons.
 const int btn_h = 40;
-const int all_btn_x = game_w+60;
+//The x coord of all of the buttons.
+const int all_btn_x = game_w+(padding*2)+1;
+//The spacing between buttons.
 const int btn_gap = 45;
-const int step_btn_y   = 10+(btn_gap*0);
-const int run_btn_y    = 10+(btn_gap*1);
-const int pause_btn_y  = 10+(btn_gap*2);
-const int reset_btn_y  = 10+(btn_gap*3);
-const int random_btn_y = 10+(btn_gap*4);
-const int clear_btn_y  = 10+(btn_gap*5);
-const int load_btn_y   = 10+(btn_gap*6);
-const int save_btn_y   = 10+(btn_gap*7);
-const int quit_btn_y   = 10+(btn_gap*8);
-const int size1_btn_y  = 10+(btn_gap*9);
-const int size2_btn_y  = 10+(btn_gap*10);
-const int size3_btn_y  = 10+(btn_gap*11);
+//The gaps between buttons including the padding.
+const int btn_diff = 9;
+//The following are for the y coords of the various buttons.
+const int step_btn_y   = btn_diff+(btn_gap*0);
+const int run_btn_y    = btn_diff+(btn_gap*1);
+const int pause_btn_y  = btn_diff+(btn_gap*2);
+const int reset_btn_y  = btn_diff+(btn_gap*3);
+const int random_btn_y = btn_diff+(btn_gap*4);
+const int clear_btn_y  = btn_diff+(btn_gap*5);
+const int load_btn_y   = btn_diff+(btn_gap*6);
+const int save_btn_y   = btn_diff+(btn_gap*7);
+const int quit_btn_y   = btn_diff+(btn_gap*8);
+const int size1_btn_y  = btn_diff+(btn_gap*9);
+const int size2_btn_y  = btn_diff+(btn_gap*10);
+const int size3_btn_y  = btn_diff+(btn_gap*11);
+//The following are for the drawing color (GUI borders and text).
 const int drawing_color_r = 255;
-const int drawing_color_g = 200;
-const int drawing_color_b = 20;
-const int bg_color_r = 40;
-const int bg_color_g = 40;
-const int bg_color_b = 40;
+const int drawing_color_g = 255;
+const int drawing_color_b = 255;
+//The following are for the CA color.
+const int ca_color_r = 0;
+const int ca_color_g = 255;
+const int ca_color_b = 0;
+//The following are for the screen's background.
+const int bg_color_r = 0;
+const int bg_color_g = 0;
+const int bg_color_b = 0;
+//The y coord of the log divider.
+const int divider_y = 549;
+//The y coord of the log text.
+const int log_text_y = 570;
+//The height of the log area.
+const int log_h = 43;
+
+//A constant that represents when a message is a click message.
+const int message_type_click = 1;
+//A constant that represents when a message is a file message.
+const int message_type_file = 2;
 
 /** 
  * Description: Calculates the next state of the indexed cell given the current state of the indexed cell
@@ -49,6 +79,9 @@ const int bg_color_b = 40;
  */
 unsigned char ruleGameOfLife(CellularAutomaton *tempCA, int x, int y); 
 
+/** 
+ * Description: Saves the displayed CA as the text representation.
+ */
 void CAGraphicsSimulator::saveCAToFile() {
     //The following lines gets the current time for the file name.
     time_t theTime = time(nullptr);
@@ -99,10 +132,24 @@ void CAGraphicsSimulator::simulate() {
 }
 
 /** 
+ * Description: Logs text graphically in the corner of the Graphics Window.
+ */
+void CAGraphicsSimulator::logEvent(string text) {
+    //The following lines clear old log.
+    this->gc->setDrawingColor(bg_color_r,bg_color_g,bg_color_b);
+    this->gc->fillRectangle(game_w+padding,divider_y+padding,gui_w-(padding*2),log_h);
+    //The following lines draw the text.
+    this->gc->setDrawingColor(drawing_color_r,drawing_color_g,drawing_color_b);
+    this->gc->drawstring(game_w+padding+5, log_text_y, ">> " + text);
+    this->gc->repaint(); //Update the screen to display the newly drawn CA.
+}
+
+/** 
  * Description: Displays the CA on the Graphics Window.
  */
 void CAGraphicsSimulator::displayCA() {
     this->clearGame(); //Clear the outdated CA from the game screen.
+    this->gc->setDrawingColor(ca_color_r,ca_color_g,ca_color_b);
     this->ca->displayCA(this->gc); //Put the CA on the Graphics Window.
     this->gc->repaint(); //Update the screen to display the newly drawn CA.
 }
@@ -114,14 +161,15 @@ void CAGraphicsSimulator::checkForAndExecuteMessages() {
     list<GCMessage> listOfGCM = this->gc->checkForMessages(); //Get the messages to execute.
     //Execute the messages if there are any.
     for (list<GCMessage>::iterator it = listOfGCM.begin(); it != listOfGCM.end(); ++it) { //For each message.
-        string message = it->getMessage();
-        if(it->getMessageType() == 1) {
-            string x_str = message.substr(0, message.find(","));
-            string y_str = message.substr(message.find(",")+1, message.length());
-            this->clickEvent(stoi(x_str), stoi(y_str));
-        } else if (it->getMessageType() == 2) {
-            this->ca->loadCAfromFile(message, this->ca->getQuiescentState(), 1);
-            this->displayCA();
+        string message = it->getMessage(); //Get the message in the message.
+        if(it->getMessageType() == message_type_click) { //If the message is a click.
+            string x_str = message.substr(0, message.find(",")); //Get the x coord.
+            string y_str = message.substr(message.find(",")+1, message.length()); //Get the y coord.
+            this->clickEvent(stoi(x_str), stoi(y_str)); //Send a click event at the coords.
+        } else if (it->getMessageType() == message_type_file) { //If the message is a file.
+            this->ca->loadCAfromFile(message, this->ca->getQuiescentState(), 1); //Load the selected file.
+            this->displayCA(); //Display the new CA.
+            this->logEvent("FILE LOADED");
         }
     }
 }
@@ -167,43 +215,57 @@ void CAGraphicsSimulator::stepAndDisplayCA() {
 void CAGraphicsSimulator::clickEvent(int x, int y) {
     if(x > all_btn_x && x < all_btn_x + btn_w) { //If the click was within the x button area.
         if(y > step_btn_y && y < step_btn_y + btn_h) { //If the step button was clicked.
+            this->logEvent("STEPPING...");
             this->stepAndDisplayCA(); //Step and display the CA.
             this->shouldStep = 0; //Stop auto simulate.
+            this->logEvent("STEPPED");
         } else if(y > run_btn_y && y < run_btn_y + btn_h) {
             this->shouldStep = 1; //Enable auto simulate.
+            this->logEvent("RUNNING");
         } else if(y > pause_btn_y && y < pause_btn_y + btn_h) {
             this->shouldStep = 0; //Stop auto simulate.
+            this->logEvent("PAUSED");
         } else if(y > reset_btn_y && y < reset_btn_y + btn_h) {
             this->ca->loadCAfromFile(ca->getFileName(), ca->getQuiescentState(), 0); //Reload the CA and don't save the file name (since it didn't change).
             this->shouldStep = 0; //Stop auto simulate.
             this->displayCA(); //Display the CA graphically.
+            this->logEvent("RESETTED");
         } else if(y > random_btn_y && y < random_btn_y + btn_h) {
+            this->logEvent("RANDOMIZING...");
             this->ca->randomize(); //Set all cells in the CA to 0 or 1 randomly.
             this->shouldStep = 0; //Stop auto simulate.
             this->displayCA(); //Display the CA graphically.
+            this->logEvent("RANDOMIZED");
         } else if(y > clear_btn_y && y < clear_btn_y + btn_h) {
             this->ca->initCA(); //Set all cells in the CA to 0 (the quiescent state for CGOL).
             this->shouldStep = 0; //Stop auto simulate.
             this->displayCA(); //Display the CA graphically.
+            this->logEvent("CLEARED");
         } else if(y > load_btn_y && y < load_btn_y + btn_h) {
             this->shouldStep = 0; //Stop auto simulate.
+            this->logEvent("FILE REQUESTED");
             this->gc->requestFile(); //Tell the GC to prompt the user for a file to load.
         } else if(y > save_btn_y && y < save_btn_y + btn_h) {
-            this->saveCAToFile();
+            this->saveCAToFile(); //Save the CA to a file.
+            this->logEvent("SAVED");
         } else if(y > quit_btn_y && y < quit_btn_y + btn_h) {
             this->shouldExit = 1; //Exit the program.
+            this->logEvent("WINDOW DISCONNECTED");
         } else if(y > size1_btn_y && y < size1_btn_y + btn_h) {
             this->ca->loadCAfromFile("./predefinedCAs/40by40.txt", ca->getQuiescentState(), 0); //Load the 40x40 CA and don't save the file name.
             this->shouldStep = 0; //Stop auto simulate.
             this->displayCA(); //Display the CA graphically.
+            this->logEvent("40x40 LOADED");
         } else if(y > size2_btn_y && y < size2_btn_y + btn_h) {
             this->ca->loadCAfromFile("./predefinedCAs/150by150.txt", ca->getQuiescentState(), 0); //Load the 150x150 CA and don't save the file name.
             this->shouldStep = 0; //Stop auto simulate.
             this->displayCA(); //Display the CA graphically.
+            this->logEvent("150x150 LOADED");
         } else if(y > size3_btn_y && y < size3_btn_y + btn_h) {
             this->ca->loadCAfromFile("./predefinedCAs/600by600.txt", ca->getQuiescentState(), 0); //Load the 600x600 CA and don't save the file name.
             this->shouldStep = 0; //Stop auto simulate.
             this->displayCA(); //Display the CA graphically.
+            this->logEvent("600x600 LOADED");
         }
     } else { //If the click wasn't in the button area.
         this->checkForCAClick(x, y); //Check to see if the CA was clicked.
@@ -227,9 +289,11 @@ void CAGraphicsSimulator::checkForCAClick(int x, int y) {
         if(this->ca->getCAdata()[index] == 1) { //If the cell was on.
             this->ca->set2DCACell(ca_x, ca_y, 0); //Turn the cell off.
             this->displayCA(); //Display the CA graphically.
+            this->logEvent("(" + to_string(ca_x) + ", " + to_string(ca_y) + ") TOGGLED OFF");
         } else { //If the cell was off.
             this->ca->set2DCACell(ca_x, ca_y, 1); //Turn the cell on.
             this->displayCA(); //Display the CA graphically.
+            this->logEvent("(" + to_string(ca_x) + ", " + to_string(ca_y) + ") TOGGLED ON");
         }
     }
 }
@@ -259,6 +323,9 @@ void CAGraphicsSimulator::drawGUI() {
     this->drawButton(all_btn_x, size1_btn_y, btn_w, btn_h, "SIZE 1");
     this->drawButton(all_btn_x, size2_btn_y, btn_w, btn_h, "SIZE 2");
     this->drawButton(all_btn_x, size3_btn_y, btn_w, btn_h, "SIZE 3");
+    //Draw logging boundary.
+    this->gc->setDrawingColor(drawing_color_r,drawing_color_g,drawing_color_b);
+    this->gc->fillRectangle(game_w+padding,divider_y,gui_w-(padding*2),padding);
 }
 
 /** 
