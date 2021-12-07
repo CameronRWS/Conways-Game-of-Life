@@ -1,16 +1,27 @@
-main: main.o GraphicsClient.o CellularAutomaton.o;
-	g++ main.o GraphicsClient.o CellularAutomaton.o
-	mv a.out gol.out 
+CXXFLAGS += -std=c++11
+CXX=g++
 
-main.o: main.cpp GraphicsClient.h CellularAutomaton.h
-	g++ -c main.cpp
+gol: casimulator.o CAGraphicsSimulator.o CellularAutomaton.o GraphicsClient.o GCMessage.o;
+	g++ -o $@ $^
 
-GraphicsClient.o: GraphicsClient.cpp GraphicsClient.h CellularAutomaton.h
-	g++ -c GraphicsClient.cpp
+casimulator.o: casimulator.cpp CAGraphicsSimulator.h GraphicsClient.h CellularAutomaton.h
+
+GraphicsClient.o: GraphicsClient.cpp GraphicsClient.h GCMessage.h
 
 CellularAutomaton.o: CellularAutomaton.cpp CellularAutomaton.h GraphicsClient.h
-	g++ -c CellularAutomaton.cpp
+
+GCMessage.o: GCMessage.cpp GCMessage.h
+
+CAGraphicsSimulator.o: CAGraphicsSimulator.cpp CAGraphicsSimulator.h GraphicsClient.h CellularAutomaton.h
+
+%.o : %.cpp
+	$(CXX) $(CXXFLAGS) -c $<
 
 clean: 
-	rm *.o
-	rm *.out
+	-rm *.o
+	-rm gol
+
+run:
+	./gol "./predefinedCAs/gliderwar.txt"
+
+.PHONY: clean run

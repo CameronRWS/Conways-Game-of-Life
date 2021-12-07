@@ -1,5 +1,5 @@
-# COMS 327 - Project 2 Part A
-This part of the project is an implementation of Conway's Game of Life displayed on a graphics window.
+# COMS 327 - Project 2 Part B
+This part of the project is an implementation of Conway's Game of Life displayed on a graphics window with the ability for user interaction.
 
 ## Features Implemented
 
@@ -24,7 +24,7 @@ make
 ```
 Run this command to run the project.
 ```sh
-./gol.out <text file path to CA definition (string)>
+./gol <text file path to CA definition (string)>
 ```
 Run this command to clean the project (remove *.o and *.out files).
 ```sh
