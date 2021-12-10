@@ -45,7 +45,7 @@ GraphicsClient::GraphicsClient(const GraphicsClient& originalGC) {
  */
 GraphicsClient::~GraphicsClient() {
     close(this->sockfd);
-    this->sockfd = -1;
+    this->sockfd = -1; //Prevent use after deleting.
 }
 
 /**

@@ -326,7 +326,7 @@ void CAGraphicsSimulator::saveCAToFile() {
     ofstream theFile(theFileName);
     //The following lines prints the CA to the file.
     int maxIndex = this->ca->getWidth() * this->ca->getHeight(); 
-    theFile << this->ca->getWidth() << " " << this->ca->getHeight() << "\n"; //Put the dimensions at the top.
+    theFile << this->ca->getHeight() << " " << this->ca->getWidth() << "\n"; //Put the dimensions at the top.
     for(int i = 0; i < maxIndex; i++) { //For all cells within the CA.
         if(i % (this->ca->getWidth()) == 0 && i != 0) { //If i is at the end of a row, create a new line.
             theFile << "\n" << (int)this->ca->getCAdata()[i] << " "; //Print the return char then the char with a space after it.
