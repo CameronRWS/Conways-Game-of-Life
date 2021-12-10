@@ -212,7 +212,7 @@ void CAGraphicsSimulator::clickEvent(int x, int y) {
             this->ca->loadCAfromFile(ca->getFileName(), ca->getQuiescentState(), 0); //Reload the CA and don't save the file name (since it didn't change).
             this->shouldStep = 0; //Stop auto simulate.
             this->displayCA(); //Display the CA graphically.
-            this->logEvent("RESETTED");
+            this->logEvent("RESET");
         } else if(y > random_btn_y && y < random_btn_y + btn_h) {
             this->logEvent("RANDOMIZING...");
             this->ca->randomize(); //Set all cells in the CA to 0 or 1 randomly.
